@@ -1,0 +1,70 @@
+import {
+  type Control,
+  Controller,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectGroup,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from "@/components/ui/multi-select";
+
+export interface MultiSelectOption {
+  label: string;
+  value: string;
+}
+
+interface CustomMultiSelectProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  label: string;
+  placeholder?: string;
+  options: MultiSelectOption[];
+  loading?: boolean;
+  disabled?: boolean;
+}
+
+export function CustomMultiSelect<T extends FieldValues>({
+  control,
+  name,
+  label,
+  placeholder = "Select options...",
+  options,
+  loading = false,
+  disabled,
+}: CustomMultiSelectProps<T>) {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid} className="w-full">
+          <FieldLabel htmlFor={name} className="text-[#111111]">{label}</FieldLabel>
+          <MultiSelect onValuesChange={field.onChange} values={field.value || []}>
+            <MultiSelectTrigger className="min-h-11 w-full rounded-xl border-[#E8F5EE] bg-white text-sm text-[#111111] shadow-sm focus-visible:border-[#00843D] focus-visible:ring-[#00843D]/20" id={name} disabled={disabled || loading}>
+              <MultiSelectValue placeholder={placeholder} />
+            </MultiSelectTrigger>
+            <MultiSelectContent className="max-h-72 border-[#E8F5EE] bg-white text-[#111111]">
+              <MultiSelectGroup>
+                {loading ? (
+                  <div className="p-2 text-center text-sm text-muted-foreground">Loading options...</div>
+                ) : options.length === 0 ? (
+                  <div className="p-2 text-center text-sm text-muted-foreground">No options available</div>
+                ) : (
+                  options.map((option) => <MultiSelectItem key={option.value} value={option.value}>{option.label}</MultiSelectItem>)
+                )}
+              </MultiSelectGroup>
+            </MultiSelectContent>
+          </MultiSelect>
+
+          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+        </Field>
+      )}
+    />
+  );
+}
