@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Results — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1 id="title">Results</h1>
+              <p id="sub"></p>
+            </div>
+            <div class="actions" id="head-actions"></div>
+          </div>
+          <div id="body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth(["admin", "teacher", "student"]))) return;
+
+    var user = Session.user;
+    var year = Session.year;
+    var yearId = year ? year.id : null;
+
+    if (user.role === "student") await studentView();
+    else await staffView();
+
+    pageReady();
+
+    /* =================================================================
+       Student — read-only transcript of published results
+       ================================================================= */
+    async function studentView() {
+      $("#sub").textContent = "Your published results" + (year ? " for " + year.name : "");
+      $("#head-actions").innerHTML =
+        '<button class="btn btn-outline" onclick="window.print()">Print</button>';
+
+      var res = await API.studentTranscript(user.id, yearId);
+      if (res.error) {
+        $("#body").innerHTML = '<div class="alert alert-error">' + esc(errMessage(res.error)) + "</div>";
+        return;
+      }
+
+      var rows = res.data.rows;
+      var s = res.data.summary;
+
+      $("#body").innerHTML =
+        '<div class="grid grid-4">' +
+          statTile("GPA", s.gpa.toFixed(2), "Across published courses", true) +
+          statTile("Courses", s.courses, "Results released") +
+          statTile("Total units", s.units, "Registered units") +
+          statTile("Passed", s.passed, "Grade D or better") +
+        "</div>" +
+        '<div class="card">' +
+          '<div class="card-head"><div><h2>Result sheet</h2>' +
+            "<p>Only results your lecturers have published appear here.</p></div></div>" +
+          '<div class="table-wrap"><table class="data">' +
+            "<thead><tr><th>Code</th><th>Course</th>" +
+            '<th class="center">Units</th><th class="center">CA</th>' +
+            '<th class="center">Exam</th><th class="numeric">Total</th>' +
+            "<th>Grade</th><th>Remark</th></tr></thead><tbody>" +
+            (rows.length
+              ? rows.map(function (r) {
+                  return "<tr><td><strong>" + esc(r.code) + "</strong></td>" +
+                    "<td>" + esc(r.name) + "</td>" +
+                    '<td class="center">' + r.unit + "</td>" +
+                    '<td class="center">' + r.caScore + "</td>" +
+                    '<td class="center">' + r.examScore + "</td>" +
+                    '<td class="numeric"><strong>' + r.total + "</strong></td>" +
+                    '<td><span class="' + gradeBadgeClass(r.grade) + '">' + esc(r.grade) + "</span></td>" +
+                    "<td>" + esc(r.remark) + "</td></tr>";
+                }).join("")
+              : '<tr><td colspan="8" class="table-empty">No results have been published for you yet.</td></tr>') +
+          "</tbody></table></div>" +
+          (rows.length
+            ? '<div class="pagination">Cumulative GPA: <strong>' + s.gpa.toFixed(2) +
+              "</strong> from " + s.units + " units</div>"
+            : "") +
+        "</div>";
+    }
+
+    /* =================================================================
+       Lecturer / admin — score entry and publication
+       ================================================================= */
+    async function staffView() {
+      $("#sub").textContent = "Record CA and exam scores, then publish the course sheet.";
+
+      var classesRes = await API.listClasses();
+      var classes = classesRes.data || [];
+
+      $("#body").innerHTML =
+        '<div class="card">' +
+          '<div class="card-head"><div><h2>Choose class and course</h2>' +
+            "<p>Only students who registered the course appear in the sheet.</p></div></div>" +
+          '<div class="card-body">' +
+            '<div class="grid grid-3">' +
+              '<div class="field" style="margin:0"><label for="sel-class">Class</label>' +
+                '<select id="sel-class"><option value="">Select class</option>' +
+                classes.map(function (c) {
+                  return '<option value="' + esc(c.id) + '">' + esc(c.name) + "</option>";
+                }).join("") + "</select></div>" +
+              '<div class="field" style="margin:0"><label for="sel-course">Course</label>' +
+                '<select id="sel-course" disabled><option value="">Select course</option></select></div>' +
+              '<div class="field" style="margin:0"><label>&nbsp;</label>' +
+                '<div style="display:flex;gap:8px">' +
+                  '<button class="btn btn-primary" id="btn-save" disabled>Save scores</button>' +
+                  '<button class="btn btn-outline" id="btn-publish" disabled>Publish</button>' +
+                "</div></div>" +
+            "</div>" +
+          "</div>" +
+        "</div>" +
+        '<div id="sheet"></div>';
+
+      var selClass = $("#sel-class");
+      var selCourse = $("#sel-course");
+      var state = { klass: null, course: null, students: [], results: {} };
+
+      selClass.addEventListener("change", onClassChange);
+      selCourse.addEventListener("change", loadSheet);
+      $("#btn-save").addEventListener("click", saveScores);
+      $("#btn-publish").addEventListener("click", publish);
+
+      async function onClassChange() {
+        state.klass = classes.find(function (c) { return c.id === selClass.value; }) || null;
+        selCourse.innerHTML = '<option value="">Select course</option>';
+        selCourse.disabled = !state.klass;
+        $("#sheet").innerHTML = "";
+        setButtons(false);
+        if (!state.klass) return;
+
+        var res = await API.getCoursesByIds(state.klass.subjects || []);
+        var courses = res.data || [];
+
+        // A lecturer may only touch courses assigned to them.
+        if (user.role === "teacher") {
+          var mine = user.teacher_subject || [];
+          courses = courses.filter(function (c) { return mine.indexOf(c.id) !== -1; });
+        }
+
+        if (!courses.length) {
+          $("#sheet").innerHTML =
+            '<div class="alert alert-warn"><strong>No courses available</strong>' +
+            (user.role === "teacher"
+              ? "None of your assigned courses belong to this class."
+              : "This class has no courses attached yet.") + "</div>";
+          return;
+        }
+
+        courses.forEach(function (c) {
+          var o = document.createElement("option");
+          o.value = c.id;
+          o.textContent = c.code + " — " + c.name;
+          selCourse.appendChild(o);
+        });
+        state.courses = courses;
+      }
+
+      async function loadSheet() {
+        state.course = (state.courses || []).find(function (c) { return c.id === selCourse.value; }) || null;
+        if (!state.course) { $("#sheet").innerHTML = ""; setButtons(false); return; }
+
+        $("#sheet").innerHTML = '<div class="page-loading"><div class="spinner"></div></div>';
+
+        // Students eligible for this sheet = those who registered this course.
+        var regs = await API.listRegistrations({
+          classId: state.klass.id,
+          academicYearId: yearId,
+        });
+        var eligible = (regs.data || []).filter(function (r) {
+          return (r.subject_ids || []).indexOf(state.course.id) !== -1;
+        });
+
+        var studentsRes = await API.getUsersByIds(eligible.map(function (r) { return r.student_id; }));
+        state.students = studentsRes.data || [];
+
+        var resultsRes = await API.listResults({
+          classId: state.klass.id,
+          subjectId: state.course.id,
+          academicYearId: yearId,
+        });
+        state.results = {};
+        (resultsRes.data || []).forEach(function (r) { state.results[r.student_id] = r; });
+
+        renderSheet();
+        setButtons(state.students.length > 0);
+      }
+
+      function renderSheet() {
+        var saved = Object.keys(state.results).length;
+        var published = Object.keys(state.results).filter(function (k) {
+          return state.results[k].result_status === "published";
+        }).length;
+
+        $("#sheet").innerHTML =
+          '<div class="grid grid-4">' +
+            statTile("Registered students", state.students.length, "Eligible for this course") +
+            statTile("Saved records", saved, "Entered so far") +
+            statTile("Published", published, "Visible to students") +
+            statTile("Draft", saved - published, "Not yet released", true) +
+          "</div>" +
+          '<div class="card">' +
+            '<div class="card-head"><div><h2>' + esc(state.course.code) + " — " + esc(state.course.name) + "</h2>" +
+              "<p>CA is out of " + MAX_CA + ", exam is out of " + MAX_EXAM + ".</p></div></div>" +
+            '<div class="table-wrap"><table class="data">' +
+              "<thead><tr><th>Student</th><th>CA score</th><th>Exam score</th>" +
+              '<th class="numeric">Total</th><th>Grade</th><th>Status</th></tr></thead><tbody>' +
+              (state.students.length
+                ? state.students.map(function (s) {
+                    var r = state.results[s.id];
+                    return '<tr data-student="' + esc(s.id) + '">' +
+                      "<td><strong>" + esc(s.name) + "</strong>" +
+                        '<span class="sub">' + esc(s.email) + "</span></td>" +
+                      '<td><input class="score ca" type="number" min="0" max="' + MAX_CA + '" ' +
+                        'value="' + (r ? esc(r.ca_score) : "") + '" placeholder="0-' + MAX_CA + '"></td>' +
+                      '<td><input class="score exam" type="number" min="0" max="' + MAX_EXAM + '" ' +
+                        'value="' + (r ? esc(r.exam_score) : "") + '" placeholder="0-' + MAX_EXAM + '"></td>' +
+                      '<td class="numeric total">' + (r ? esc(r.total_score) : "—") + "</td>" +
+                      '<td class="grade">' + (r ? '<span class="' + gradeBadgeClass(r.grade) + '">' +
+                        esc(r.grade) + "</span>" : "—") + "</td>" +
+                      '<td class="status">' + (r ? statusBadge(r.result_status) :
+                        '<span class="badge badge-grey">Not entered</span>') + "</td>" +
+                    "</tr>";
+                  }).join("")
+                : '<tr><td colspan="6" class="table-empty">No student has registered this course yet.</td></tr>') +
+            "</tbody></table></div>" +
+          "</div>";
+
+        // Live total/grade preview as scores are typed.
+        $$("#sheet input.score").forEach(function (input) {
+          input.addEventListener("input", function () {
+            var tr = input.closest("tr");
+            var ca = Number($(".ca", tr).value) || 0;
+            var exam = Number($(".exam", tr).value) || 0;
+            var g = gradeResult(ca, exam, state.course.unit);
+            $(".total", tr).textContent = g.total;
+            $(".grade", tr).innerHTML = '<span class="' + gradeBadgeClass(g.grade) + '">' + g.grade + "</span>";
+          });
+        });
+      }
+
+      function setButtons(on) {
+        $("#btn-save").disabled = !on;
+        $("#btn-publish").disabled = !on;
+      }
+
+      async function saveScores() {
+        var rows = $$("#sheet tbody tr[data-student]");
+        if (!rows.length) return;
+
+        // Validate before writing anything.
+        var payload = [];
+        for (var i = 0; i < rows.length; i++) {
+          var tr = rows[i];
+          var caRaw = $(".ca", tr).value.trim();
+          var examRaw = $(".exam", tr).value.trim();
+          if (caRaw === "" && examRaw === "") continue;
+
+          var ca = Number(caRaw) || 0;
+          var exam = Number(examRaw) || 0;
+          if (ca < 0 || ca > MAX_CA || exam < 0 || exam > MAX_EXAM) {
+            toastErr("CA must be 0-" + MAX_CA + " and exam 0-" + MAX_EXAM + ".");
+            return;
+          }
+          payload.push({
+            studentId: tr.getAttribute("data-student"),
+            subjectId: state.course.id,
+            classId: state.klass.id,          // NOT NULL in the schema
+            academicYearId: yearId,
+            caScore: ca,
+            examScore: exam,
+            unit: state.course.unit,
+          });
+        }
+
+        if (!payload.length) { toastErr("Enter at least one score before saving."); return; }
+
+        var btn = $("#btn-save");
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        var failed = 0;
+        for (var j = 0; j < payload.length; j++) {
+          var res = await API.saveResult(payload[j]);
+          if (res.error) { failed++; console.error(res.error); }
+        }
+
+        btn.disabled = false;
+        btn.textContent = "Save scores";
+
+        if (failed) toastErr(failed + " record(s) could not be saved.");
+        else toastOk("Saved " + payload.length + " result record(s).");
+
+        await loadSheet();
+      }
+
+      function publish() {
+        confirmAction(
+          "Publish results",
+          "Publishing makes every saved score for " + state.course.code +
+            " visible to students in this class. Continue?",
+          async function () {
+            var res = await API.publishResults(state.klass.id, state.course.id, yearId);
+            if (res.error) { toastErr(errMessage(res.error, "Could not publish")); return; }
+            toastOk("Results published for " + state.course.code + ".");
+            await loadSheet();
+          },
+          "Publish"
+        );
+      }
+    }
+
+    function statTile(label, value, note, gold) {
+      return '<div class="stat' + (gold ? " gold" : "") + '">' +
+        '<div class="label">' + esc(label) + "</div>" +
+        '<div class="value">' + esc(value) + "</div>" +
+        (note ? '<div class="note">' + esc(note) + "</div>" : "") + "</div>";
+    }
+  })();
+  </script>
+</body>
+</html>

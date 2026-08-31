@@ -58,10 +58,10 @@ const UserTable = ({
   const colSpan = role === "teacher" || role === "student" ? 4 : 3;
 
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-[#E8F5EE] bg-white shadow-[0_18px_35px_rgba(0,132,61,0.05)]">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="overflow-x-auto">
         <Table className="min-w-[760px]">
-          <TableHeader className="bg-[#E8F5EE]">
+          <TableHeader className="bg-surface-muted">
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
@@ -86,10 +86,10 @@ const UserTable = ({
             ) : (
               users.map((user) => (
                 <TableRow key={user._id}>
-                  <TableCell className="font-medium text-[#111111]">
+                  <TableCell className="font-medium text-foreground">
                     <div className="flex min-w-[180px] items-center gap-3 whitespace-normal">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFF9CC]">
-                        <UserIcon className="h-4 w-4 text-[#00843D]" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft">
+                        <UserIcon className="h-4 w-4 text-primary" />
                       </div>
                       <span>{user.name}</span>
                     </div>
@@ -102,7 +102,7 @@ const UserTable = ({
                           {user.teacherSubjects.map((subject) => (
                             <Badge
                               variant="outline"
-                              className="border-[#E8F5EE] bg-[#E8F5EE] text-[#111111]"
+                              className="border-border bg-surface-muted text-foreground"
                               key={subject._id}
                             >
                               {subject.name}
@@ -117,7 +117,7 @@ const UserTable = ({
                   {role === "student" && (
                     <TableCell>
                       {user.studentClass?._id ? (
-                        <Badge variant="outline" className="border-[#E8F5EE] bg-[#E8F5EE] text-[#111111]">
+                        <Badge variant="outline" className="border-border bg-surface-muted text-foreground">
                           {user.studentClass.name}
                         </Badge>
                       ) : (
@@ -128,11 +128,11 @@ const UserTable = ({
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-[#FFF9CC]">
+                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-accent-soft">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-[#E8F5EE]">
+                      <DropdownMenuContent align="end" className="border-border">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleEdit(user)}>
                           <Pencil className="mr-2 h-4 w-4" /> Edit

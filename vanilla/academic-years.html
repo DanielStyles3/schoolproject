@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Academic Sessions — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>Academic Sessions</h1>
+              <p>Only one session can be current. Registration and results always belong to the current session.</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" id="btn-new">+ New session</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Session</th><th>Starts</th><th>Ends</th>
+                    <th>Status</th><th class="numeric">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth(["admin"]))) return;
+
+    var tbody = $("#rows");
+    $("#btn-new").addEventListener("click", function () { openForm(null); });
+
+    await load();
+    pageReady();
+
+    async function load() {
+      tableLoading(tbody, 5);
+      var res = await API.listYears();
+      if (res.error) { tableEmpty(tbody, 5, errMessage(res.error)); return; }
+
+      var rows = res.data || [];
+      if (!rows.length) {
+        tableEmpty(tbody, 5, "No academic session yet. Create one to start using the portal.");
+        return;
+      }
+
+      tbody.innerHTML = rows.map(function (y) {
+        return "<tr>" +
+          "<td><strong>" + esc(y.name) + "</strong></td>" +
+          "<td>" + esc(fmtDate(y.from_year)) + "</td>" +
+          "<td>" + esc(fmtDate(y.to_year)) + "</td>" +
+          "<td>" + (y.is_current
+            ? '<span class="badge badge-green">Current</span>'
+            : '<span class="badge badge-grey">Closed</span>') + "</td>" +
+          '<td class="numeric">' +
+            (y.is_current ? "" :
+              '<button class="btn btn-outline btn-sm" data-current="' + esc(y.id) + '">Make current</button> ') +
+            '<button class="btn btn-outline btn-sm" data-edit="' + esc(y.id) + '">Edit</button> ' +
+            '<button class="btn btn-outline btn-sm" data-del="' + esc(y.id) + '">Delete</button>' +
+          "</td></tr>";
+      }).join("");
+
+      $$("[data-current]", tbody).forEach(function (b) {
+        b.addEventListener("click", async function () {
+          b.disabled = true;
+          var res = await API.makeYearCurrent(b.getAttribute("data-current"));
+          if (res.error) { toastErr(errMessage(res.error)); b.disabled = false; return; }
+          toastOk("Current session updated");
+          // The sidebar shows the session name, so refresh the whole page.
+          window.location.reload();
+        });
+      });
+
+      $$("[data-edit]", tbody).forEach(function (b) {
+        b.addEventListener("click", function () {
+          openForm(rows.find(function (r) { return r.id === b.getAttribute("data-edit"); }));
+        });
+      });
+
+      $$("[data-del]", tbody).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var id = b.getAttribute("data-del");
+          var row = rows.find(function (r) { return r.id === id; });
+          if (row.is_current) {
+            toastErr("Make another session current before deleting this one.");
+            return;
+          }
+          confirmAction("Delete session",
+            'Delete "' + row.name + '"? Classes, registrations and results in this session will be removed.',
+            async function () {
+              var res = await API.deleteYear(id);
+              if (res.error) { toastErr(errMessage(res.error)); return; }
+              toastOk("Session deleted");
+              load();
+            });
+        });
+      });
+    }
+
+    function toInput(value) {
+      if (!value) return "";
+      var d = new Date(value);
+      return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
+    }
+
+    function openForm(row) {
+      var editing = !!row;
+      var backdrop = openModal(
+        editing ? "Edit session" : "New academic session",
+        '<div class="field"><label for="f-name">Session name</label>' +
+          '<input id="f-name" value="' + (editing ? esc(row.name) : "") + '" placeholder="2025/2026"></div>' +
+        '<div class="field"><label for="f-from">Start date</label>' +
+          '<input id="f-from" type="date" value="' + (editing ? toInput(row.from_year) : "") + '"></div>' +
+        '<div class="field"><label for="f-to">End date</label>' +
+          '<input id="f-to" type="date" value="' + (editing ? toInput(row.to_year) : "") + '"></div>' +
+        '<div class="field"><label for="f-current">Make this the current session</label>' +
+          '<select id="f-current">' +
+            '<option value="false"' + (editing && row.is_current ? "" : " selected") + ">No</option>" +
+            '<option value="true"' + (editing && row.is_current ? " selected" : "") + ">Yes</option>" +
+          "</select></div>" +
+        '<p class="field-error hidden" id="f-err"></p>',
+        '<button class="btn btn-outline" id="f-cancel">Cancel</button>' +
+        '<button class="btn btn-primary" id="f-save">' + (editing ? "Save changes" : "Create session") + "</button>"
+      );
+
+      $("#f-cancel", backdrop).addEventListener("click", closeModal);
+      $("#f-save", backdrop).addEventListener("click", async function () {
+        var err = $("#f-err", backdrop);
+        var name = $("#f-name", backdrop).value.trim();
+        var from = $("#f-from", backdrop).value;
+        var to = $("#f-to", backdrop).value;
+        var makeCurrent = $("#f-current", backdrop).value === "true";
+
+        if (!name) { err.textContent = "Session name is required."; show(err); return; }
+        if (!from || !to) { err.textContent = "Both start and end dates are required."; show(err); return; }
+        if (new Date(from) >= new Date(to)) {
+          err.textContent = "The end date must come after the start date.";
+          show(err); return;
+        }
+
+        var payload = {
+          name: name,
+          from_year: new Date(from).toISOString(),
+          to_year: new Date(to).toISOString(),
+        };
+
+        var btn = $("#f-save", backdrop);
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        var res = editing
+          ? await API.updateYear(row.id, payload)
+          : await API.createYear(Object.assign({ is_current: false }, payload));
+
+        if (res.error) {
+          err.textContent = errMessage(res.error);
+          show(err);
+          btn.disabled = false;
+          btn.textContent = editing ? "Save changes" : "Create session";
+          return;
+        }
+
+        // Setting "current" clears the flag elsewhere, so do it as its own step.
+        if (makeCurrent) {
+          var cur = await API.makeYearCurrent(res.data.id);
+          if (cur.error) { toastErr(errMessage(cur.error, "Saved, but could not set as current")); }
+        }
+
+        closeModal();
+        toastOk(editing ? "Session updated" : "Session created");
+        if (makeCurrent) window.location.reload();
+        else load();
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

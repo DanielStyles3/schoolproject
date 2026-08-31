@@ -32,13 +32,13 @@ export function CustomInput<T extends FieldValues>({
       control={control}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid} className="w-full">
-          <FieldLabel className="text-[#111111]">{label}</FieldLabel>
+          <FieldLabel className="text-foreground">{label}</FieldLabel>
           <Input
             {...field}
             {...props}
             disabled={disabled}
             className={cn(
-              "h-11 w-full rounded-xl border-[#E8F5EE] bg-white text-sm text-[#111111] shadow-sm placeholder:text-[#4B5563]/70 focus-visible:border-[#00843D] focus-visible:ring-[#00843D]/20",
+              "h-11 w-full rounded-xl border-border bg-card text-sm text-foreground shadow-sm placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-primary/20",
               className,
             )}
           />

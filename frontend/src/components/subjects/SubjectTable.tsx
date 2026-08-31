@@ -46,10 +46,10 @@ export function SubjectTable({
   totalPages,
 }: Props) {
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-[#E8F5EE] bg-white shadow-[0_18px_35px_rgba(0,132,61,0.05)]">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="overflow-x-auto">
         <Table className="min-w-[760px]">
-          <TableHeader className="bg-[#E8F5EE]">
+          <TableHeader className="bg-surface-muted">
             <TableRow>
               <TableHead>Code</TableHead>
               <TableHead>Course Name</TableHead>
@@ -78,10 +78,10 @@ export function SubjectTable({
             ) : (
               data.map((item) => (
                 <TableRow key={item._id}>
-                  <TableCell className="font-mono text-xs text-[#4B5563]">{item.code}</TableCell>
-                  <TableCell className="font-medium text-[#111111]">
+                  <TableCell className="font-mono text-xs text-muted-foreground">{item.code}</TableCell>
+                  <TableCell className="font-medium text-foreground">
                     <div className="flex items-center gap-2 whitespace-normal">
-                      <BookOpen className="h-4 w-4 shrink-0 text-[#00843D]" />
+                      <BookOpen className="h-4 w-4 shrink-0 text-primary" />
                       <span>{item.name}</span>
                     </div>
                   </TableCell>
@@ -99,11 +99,11 @@ export function SubjectTable({
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-[#FFF9CC]">
+                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-accent-soft">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-[#E8F5EE]">
+                      <DropdownMenuContent align="end" className="border-border">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => onEdit(item)}>
                           <Pencil className="mr-2 h-4 w-4" /> Edit Details

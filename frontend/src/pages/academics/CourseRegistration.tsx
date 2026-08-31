@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import PageShell from "@/components/global/PageShell";
 import { Info, Loader2, NotebookPen, TriangleAlert } from "lucide-react";
 import {
   Empty,
@@ -176,7 +177,7 @@ export default function CourseRegistration() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 rounded-[1.5rem] border border-[#E8F5EE] bg-white/70 p-6 text-[#4B5563] shadow-[0_18px_35px_rgba(0,132,61,0.05)]">
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-6 text-muted-foreground shadow-sm">
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
         Loading course registration details...
       </div>
@@ -184,23 +185,20 @@ export default function CourseRegistration() {
   }
 
   return (
-    <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/60 p-6 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Course Registration</h1>
-        <p className="text-muted-foreground">
-          Select the courses you want to register for the current academic year.
-        </p>
-      </div>
+    <PageShell
+      title="Course Registration"
+      description="Select the courses you want to register for the current academic year."
+    >
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-[#E8F5EE] bg-white shadow-sm"><CardHeader><CardTitle>Student</CardTitle></CardHeader><CardContent>{registrationOptions?.student?.name || "N/A"}</CardContent></Card>
-        <Card className="border-[#E8F5EE] bg-white shadow-sm"><CardHeader><CardTitle>Class</CardTitle></CardHeader><CardContent>{registrationOptions?.class?.name || "Not assigned"}</CardContent></Card>
-        <Card className="border-[#E8F5EE] bg-white shadow-sm"><CardHeader><CardTitle>Academic Year</CardTitle></CardHeader><CardContent>{registrationOptions?.academicYear?.name || "Not set"}</CardContent></Card>
-        <Card className="border-[#E8F5EE] bg-white shadow-sm"><CardHeader><CardTitle>Status</CardTitle></CardHeader><CardContent><Badge className={statusTone(registrationOptions?.registration?.status)}>{statusLabel(registrationOptions?.registration?.status)}</Badge></CardContent></Card>
+        <Card className="border-border bg-card shadow-sm"><CardHeader><CardTitle>Student</CardTitle></CardHeader><CardContent>{registrationOptions?.student?.name || "N/A"}</CardContent></Card>
+        <Card className="border-border bg-card shadow-sm"><CardHeader><CardTitle>Class</CardTitle></CardHeader><CardContent>{registrationOptions?.class?.name || "Not assigned"}</CardContent></Card>
+        <Card className="border-border bg-card shadow-sm"><CardHeader><CardTitle>Academic Year</CardTitle></CardHeader><CardContent>{registrationOptions?.academicYear?.name || "Not set"}</CardContent></Card>
+        <Card className="border-border bg-card shadow-sm"><CardHeader><CardTitle>Status</CardTitle></CardHeader><CardContent><Badge className={statusTone(registrationOptions?.registration?.status)}>{statusLabel(registrationOptions?.registration?.status)}</Badge></CardContent></Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-7">
-        <Card className="lg:col-span-4 border-[#E8F5EE] bg-white shadow-sm">
+        <Card className="lg:col-span-4 border-border bg-card shadow-sm">
           <CardHeader>
             <CardTitle>Available Courses</CardTitle>
             <CardDescription>
@@ -208,7 +206,7 @@ export default function CourseRegistration() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert className={`border ${registrationGuidance.tone === "warning" ? "border-[#FFD600] bg-[#FFF9CC] text-[#111111]" : registrationGuidance.tone === "success" ? "border-[#E8F5EE] bg-[#E8F5EE] text-[#111111]" : "border-[#E8F5EE] bg-[#E8F5EE] text-[#111111]"}`}>
+            <Alert className={`border ${registrationGuidance.tone === "warning" ? "border-accent bg-accent-soft text-foreground" : registrationGuidance.tone === "success" ? "border-border bg-surface-muted text-foreground" : "border-border bg-surface-muted text-foreground"}`}>
               {registrationGuidance.tone === "warning" ? <TriangleAlert className="h-4 w-4" /> : <Info className="h-4 w-4" />}
               <AlertTitle>{registrationGuidance.title}</AlertTitle>
               <AlertDescription>{registrationGuidance.detail}</AlertDescription>
@@ -228,7 +226,7 @@ export default function CourseRegistration() {
               (registrationOptions?.subjects || []).map((item) => {
                 const checked = selectedSubjects.includes(item._id);
                 return (
-                  <div key={item._id} className="flex items-center justify-between rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                  <div key={item._id} className="flex items-center justify-between rounded-lg border border-border bg-surface-muted p-4">
                     <div className="flex items-center gap-3">
                       <Checkbox checked={checked} onCheckedChange={(value) => toggleSubject(item._id, Boolean(value))} />
                       <div>
@@ -237,10 +235,10 @@ export default function CourseRegistration() {
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="border-[#E8F5EE] bg-white text-[#111111]">
+                      <Badge variant="outline" className="border-border bg-card text-foreground">
                         {item.unit || 3} unit(s)
                       </Badge>
-                      <Badge variant="outline" className="border-[#E8F5EE] bg-white text-[#111111]">
+                      <Badge variant="outline" className="border-border bg-card text-foreground">
                         {item.teacher?.length || 0} lecturer(s)
                       </Badge>
                     </div>
@@ -251,34 +249,34 @@ export default function CourseRegistration() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3 border-[#E8F5EE] bg-white shadow-sm">
+        <Card className="lg:col-span-3 border-border bg-card shadow-sm">
           <CardHeader>
             <CardTitle>Registration Summary</CardTitle>
             <CardDescription>Review your selection before submitting it for approval.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3"><p className="text-sm text-muted-foreground">Selected Courses</p><p className="mt-2 text-2xl font-bold">{selectedSubjects.length}</p></div>
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3"><p className="text-sm text-muted-foreground">Available Courses</p><p className="mt-2 text-2xl font-bold">{registrationOptions?.subjects?.length || 0}</p></div>
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3"><p className="text-sm text-muted-foreground">Selected Units</p><p className="mt-2 text-2xl font-bold">{selectedUnitTotal}</p></div>
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3"><p className="text-sm text-muted-foreground">Available Units</p><p className="mt-2 text-2xl font-bold">{availableUnitTotal}</p></div>
+              <div className="rounded-lg border border-border bg-surface-muted p-3"><p className="text-sm text-muted-foreground">Selected Courses</p><p className="mt-2 text-2xl font-bold">{selectedSubjects.length}</p></div>
+              <div className="rounded-lg border border-border bg-surface-muted p-3"><p className="text-sm text-muted-foreground">Available Courses</p><p className="mt-2 text-2xl font-bold">{registrationOptions?.subjects?.length || 0}</p></div>
+              <div className="rounded-lg border border-border bg-surface-muted p-3"><p className="text-sm text-muted-foreground">Selected Units</p><p className="mt-2 text-2xl font-bold">{selectedUnitTotal}</p></div>
+              <div className="rounded-lg border border-border bg-surface-muted p-3"><p className="text-sm text-muted-foreground">Available Units</p><p className="mt-2 text-2xl font-bold">{availableUnitTotal}</p></div>
             </div>
 
-            <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3">
+            <div className="rounded-lg border border-border bg-surface-muted p-3">
               <p className="mb-3 text-sm text-muted-foreground">Selected Course Codes</p>
               <div className="flex flex-wrap gap-2">
                 {selectedCourses.length === 0 ? (
                   <span className="text-sm text-muted-foreground">No course selected yet.</span>
                 ) : (
                   selectedCourses.map((item) => (
-                    <Badge key={item._id} variant="outline" className="border-[#E8F5EE] bg-white text-[#111111]">{item.code}</Badge>
+                    <Badge key={item._id} variant="outline" className="border-border bg-card text-foreground">{item.code}</Badge>
                   ))
                 )}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3 text-sm text-muted-foreground">
-              <p className="font-medium text-[#111111]">Submission guide</p>
+            <div className="rounded-lg border border-border bg-surface-muted p-3 text-sm text-muted-foreground">
+              <p className="font-medium text-foreground">Submission guide</p>
               <p className="mt-2">
                 Select the courses meant for your class, confirm the unit load looks right, then save your registration for the session.
               </p>
@@ -298,7 +296,7 @@ export default function CourseRegistration() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

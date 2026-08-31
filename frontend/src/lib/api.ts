@@ -323,7 +323,7 @@ const dashboardStats = async () => {
       totalSubjects: available.data.registration?.subjectIds?.length || 0,
       availableCourses: available.data.subjects?.length || 0,
       publishedResultsCount: (Array.isArray(results.data) ? results.data.length : results.data.results?.length) || 0,
-      registrationStatus: available.data.registration?.status || "not-submitted",
+      registrationStatus: available.data.registration?.status || "not_submitted",
       currentAcademicYear: currentYear?.name,
       studentClassName: available.data.class?.name,
     });
@@ -404,7 +404,7 @@ const apiPost = async (path: string, body: any = {}): Promise<ApiResponse> => {
   }
   if (pathname === "/course-registrations") {
     const available = await getAvailableRegistration();
-    const payload = { student_id: available.data.student._id, class_id: available.data.class._id, academic_year_id: available.data.academicYear._id, subject_ids: body.subjectIds || [], status: "approved" };
+    const payload = { student_id: available.data.student._id, class_id: available.data.class._id, academic_year_id: available.data.academicYear._id, subject_ids: body.subjectIds || [], status: "submitted" };
     const { data, error } = await supabase.from("course_registrations").upsert(payload, { onConflict: "student_id,academic_year_id" }).select("*").single();
     if (error) fail(error.message);
     return ok(mapRegistration(data));
@@ -451,6 +451,14 @@ const apiPatch = async (path: string, body: any = {}): Promise<ApiResponse> => {
     const { data, error } = await supabase.from("academic_years").update({ name: body.name, from_year: body.fromYear, to_year: body.toYear, is_current: body.isCurrent }).eq("id", id).select("*").single();
     if (error) fail(error.message);
     return ok(mapAcademicYear(data));
+  }
+  if (pathname.startsWith("/course-registrations/") && pathname.endsWith("/status")) {
+    const id = pathname.split("/")[2] || "";
+    const status = body.status === "approved" ? "approved" : "submitted";
+    const { data, error } = await supabase.from("course_registrations").update({ status }).eq("id", id).select("*").single();
+    if (error) fail(error.message);
+    if (!data) fail("Registration not found, or you do not have permission to update it", 403);
+    return ok(mapRegistration(data));
   }
   if (pathname === "/results/publish") {
     let query = supabase.from("results").update({ result_status: "published" }).eq("subject_id", body.subjectId);

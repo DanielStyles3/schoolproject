@@ -43,12 +43,12 @@ export function CustomSelect<T extends FieldValues>({
       control={control}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid} className="w-full">
-          <FieldLabel htmlFor={name} className="text-[#111111]">{label}</FieldLabel>
+          <FieldLabel htmlFor={name} className="text-foreground">{label}</FieldLabel>
           <Select onValueChange={field.onChange} value={field.value || undefined} disabled={disabled}>
-            <SelectTrigger id={name} className="h-11 w-full rounded-xl border-[#E8F5EE] bg-white text-left text-sm text-[#111111] shadow-sm focus-visible:border-[#00843D] focus-visible:ring-[#00843D]/20">
+            <SelectTrigger id={name} className="h-11 w-full rounded-xl border-border bg-card text-left text-sm text-foreground shadow-sm focus-visible:border-primary focus-visible:ring-primary/20">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent className="max-h-72 border-[#E8F5EE] bg-white text-[#111111]">
+            <SelectContent className="max-h-72 border-border bg-card text-foreground">
               {loading && <SelectItem value="loading" disabled>Loading...</SelectItem>}
               {!loading && options.length === 0 && <SelectItem value="empty" disabled>No options available</SelectItem>}
               {options.map((option) => (

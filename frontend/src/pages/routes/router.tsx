@@ -1,5 +1,4 @@
 import { Navigate, createBrowserRouter } from "react-router";
-import Home from "@/pages/Home";
 import Architecture from "@/pages/Architecture";
 import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
@@ -11,13 +10,14 @@ import UserManagementPage from "@/pages/users";
 import Classes from "@/pages/academics/Classes";
 import { Subjects } from "@/pages/academics/Subjects";
 import CourseRegistration from "@/pages/academics/CourseRegistration";
+import RegistrationApprovals from "@/pages/academics/RegistrationApprovals";
 import Results from "@/pages/academics/Results";
 import RoleGuard from "@/components/auth/RoleGuard";
 
 export const router = createBrowserRouter([
   {
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <Navigate to="/login" replace /> },
       { path: "architecture", element: <Architecture /> },
       { path: "login", element: <Login /> },
       { path: "forgot-password", element: <ForgotPassword /> },
@@ -58,6 +58,7 @@ export const router = createBrowserRouter([
             element: <RoleGuard allowedRoles={["admin"]} />,
             children: [
               { path: "settings/academic-years", element: <AcademicYear /> },
+              { path: "registrations", element: <RegistrationApprovals /> },
               {
                 path: "users/teachers",
                 element: (
@@ -72,7 +73,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      { path: "*", element: <Navigate to="/" replace /> },
+      { path: "*", element: <Navigate to="/login" replace /> },
     ],
   },
 ]);

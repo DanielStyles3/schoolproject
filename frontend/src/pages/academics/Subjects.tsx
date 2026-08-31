@@ -9,6 +9,7 @@ import CustomAlert from "@/components/global/CustomAlert";
 import type { pagination, subject } from "@/types";
 import { SubjectTable } from "@/components/subjects/SubjectTable";
 import { SubjectForm } from "@/components/subjects/SubjectForm";
+import PageShell from "@/components/global/PageShell";
 
 export const Subjects = () => {
   const [subjects, setSubjects] = useState<subject[]>([]);
@@ -98,21 +99,18 @@ export const Subjects = () => {
     }
   };
   return (
-    <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/60 p-4 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm sm:p-6">
-      <div className="flex flex-col gap-4 rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Courses</h1>
-          <p className="text-muted-foreground">
-            Manage the courses available for registration and result entry.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
+    <PageShell
+      title="Courses"
+      description="Manage the courses available for registration and result entry."
+      actions={
+        <>
           <Search search={search} setSearch={setSearch} title="Course" />
           <Button className="w-full sm:w-auto" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" /> Create Course
           </Button>
-        </div>
-      </div>
+        </>
+      }
+    >
       {/* table */}
       <SubjectTable
         data={subjects}
@@ -137,7 +135,7 @@ export const Subjects = () => {
         title="Delete Course"
         description="Are you sure you want to delete this course? This action cannot be undone."
       />
-    </div>
+    </PageShell>
   );
 };
 

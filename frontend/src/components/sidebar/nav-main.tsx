@@ -48,7 +48,11 @@ export function NavMain({
                 <SidebarMenuButton
                   asChild
                   tooltip={item.title}
-                  className={cn(item.isActive && "bg-primary text-white")}
+                  className={cn(
+                    "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    item.isActive &&
+                      "bg-sidebar-primary font-semibold text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                  )}
                 >
                   <Link to={item.url}>
                     {item.icon && <item.icon />}
@@ -81,8 +85,9 @@ export function NavMain({
                         <SidebarMenuSubButton
                           asChild
                           className={cn(
-                            "rounded-lg text-center hover:bg-primary",
-                            subItem.isActive && "bg-primary text-white"
+                            "rounded-lg text-sidebar-foreground/85 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                            subItem.isActive &&
+                              "bg-sidebar-primary font-semibold text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                           )}
                         >
                           <Link to={subItem.url}>

@@ -10,6 +10,7 @@ import AcademicYearTable from "@/components/academic-year/academic-year-table";
 import Search from "@/components/global/Search";
 import AcademicYearForm from "@/components/academic-year/AcademicYearForm";
 import CustomAlert from "@/components/global/CustomAlert";
+import PageShell from "@/components/global/PageShell";
 
 const AcademicYear = () => {
   const [years, setYears] = useState<academicYear[]>([]);
@@ -42,12 +43,13 @@ const AcademicYear = () => {
 
       const { data } = await api.get(`/academic-years?${params.toString()}`);
 
-      // Handle response structure { years: [], pagination: {} }
-      if (data.years) {
-        setYears(data.years);
-        setTotalPages(data.pagination.pages);
+      // Handle response structure { academicYears: [], pagination: {} }
+      if (data.academicYears) {
+        setYears(data.academicYears);
+        setTotalPages(data.pagination?.pages ?? 1);
       } else {
         setYears([]);
+        setTotalPages(1);
       }
     } catch {
       toast.error("Failed to fetch data");
@@ -105,20 +107,18 @@ const AcademicYear = () => {
 
   //   console.log(years);
   return (
-    <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/60 p-6 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm">
-      {/* header */}
-      <div className="flex flex-col gap-4 rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Academic Years</h1>
-          <p className="text-muted-foreground">Manage school sessions.</p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
+    <PageShell
+      title="Academic Years"
+      description="Manage school sessions."
+      actions={
+        <>
           <Search search={search} setSearch={setSearch} title="Academic Year" />
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" /> Add New Year
           </Button>
-        </div>
-      </div>
+        </>
+      }
+    >
       {/* Table Component */}
       <AcademicYearTable
         data={years}
@@ -142,7 +142,7 @@ const AcademicYear = () => {
         title="Delete Academic Year"
         description="Are you sure you want to delete this Academic Year? This action cannot be undone."
       />
-    </div>
+    </PageShell>
   );
 };
 

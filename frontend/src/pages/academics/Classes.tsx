@@ -10,6 +10,7 @@ import Search from "@/components/global/Search";
 import CustomAlert from "@/components/global/CustomAlert";
 import ClassTable from "@/components/classes/ClassTable";
 import ClassForm from "@/components/classes/ClassForm";
+import PageShell from "@/components/global/PageShell";
 
 const Classes = () => {
   // it's the same as users/academics-year components
@@ -99,21 +100,18 @@ const Classes = () => {
   };
 
   return (
-    <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/60 p-4 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm sm:p-6">
-      <div className="flex flex-col gap-4 rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Classes</h1>
-          <p className="text-muted-foreground">
-            Manage grades, sections, and teacher assignments.
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
+    <PageShell
+      title="Classes"
+      description="Manage grades, sections, and teacher assignments."
+      actions={
+        <>
           <Search search={search} setSearch={setSearch} title="Classes" />
           <Button className="w-full sm:w-auto" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" /> Create Class
           </Button>
-        </div>
-      </div>
+        </>
+      }
+    >
       {/* table */}
       <ClassTable
         data={classes}
@@ -139,7 +137,7 @@ const Classes = () => {
         title="Delete Class"
         description="Are you sure you want to delete this class? This action cannot be undone."
       />
-    </div>
+    </PageShell>
   );
 };
 

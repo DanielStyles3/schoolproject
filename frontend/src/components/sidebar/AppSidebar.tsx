@@ -11,7 +11,7 @@ import {
 
 import { NavMain } from "@/components/sidebar/nav-main";
 import { NavUser } from "@/components/sidebar/nav-user";
-import { TeamSwitcher } from "@/components/sidebar/team-switcher";
+import { BrandHeader } from "@/components/sidebar/brand-header";
 import {
   Sidebar,
   SidebarContent,
@@ -29,7 +29,6 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ThemeToogle } from "./ThemeToogle";
 
 export interface NavItem {
   title: string;
@@ -45,12 +44,7 @@ export interface NavItem {
 }
 
 export const sidebardata = {
-  teams: [
-    {
-      name: "YabaTech",
-      logo: School,
-    },
-  ],
+  school: { name: "YabaTech", logo: School },
   navMain: [
     {
       title: "Dashboard",
@@ -99,6 +93,11 @@ export const sidebardata = {
           title: "Course Registration",
           url: "/course-registration",
           roles: ["student"],
+        },
+        {
+          title: "Registration Approvals",
+          url: "/registrations",
+          roles: ["admin"],
         },
         {
           title: "Results",
@@ -188,7 +187,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={sidebardata.teams} yearName={year?.name ?? ""} />
+        <BrandHeader yearName={year?.name ?? ""} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={filteredNav} />
@@ -201,11 +200,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           )}
         >
           <SidebarMenuItem title="Logout">
-            <Button onClick={logout} variant={"ghost"} size="icon-sm">
+            <Button
+              onClick={logout}
+              variant="ghost"
+              size="icon-sm"
+              className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            >
               <LogOut />
             </Button>
           </SidebarMenuItem>
-          <ThemeToogle />
         </div>
         <NavUser user={userData} />
       </SidebarFooter>

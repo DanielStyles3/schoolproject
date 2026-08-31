@@ -441,7 +441,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/70 p-8 shadow-[0_24px_50px_rgba(0,132,61,0.06)] backdrop-blur-sm">
+      <div className="space-y-6 rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="flex items-center justify-between">
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-10 w-32" />
@@ -460,12 +460,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex-1 space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/55 p-4 pt-4 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm sm:p-6 lg:p-8 lg:pt-6">
+    <div className="flex-1 space-y-6 rounded-xl border border-border bg-card p-4 pt-4 shadow-sm sm:p-6 lg:p-8 lg:pt-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-2">
           <Badge
             variant="outline"
-            className="gap-2 border-[#FFD600] bg-[#FFF9CC] px-3 py-1 text-xs font-medium text-[#111111]"
+            className="gap-2 border-accent bg-accent-soft px-3 py-1 text-xs font-medium text-foreground"
           >
             <Sparkles className="h-3.5 w-3.5" />
             {statsData.currentAcademicYear || "Current Session Not Set"}
@@ -513,7 +513,7 @@ export default function Dashboard() {
       {user?.role === "admin" && adminHealth && (
         <div className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-7">
-            <Card className="border-[#E8F5EE] bg-white shadow-sm lg:col-span-4">
+            <Card className="border-border bg-card shadow-sm lg:col-span-4">
               <CardHeader>
                 <CardTitle>Admin Control Center</CardTitle>
                 <CardDescription>
@@ -521,44 +521,44 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Registrations This Session</p>
                   <p className="mt-2 text-2xl font-bold">{statsData.pendingRegistrations || 0}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Draft Results Waiting</p>
                   <p className="mt-2 text-2xl font-bold">{adminHealth.draftResults.length}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Published Results</p>
                   <p className="mt-2 text-2xl font-bold">{adminHealth.publishedResults.length}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">System Health Warnings</p>
                   <p className="mt-2 text-2xl font-bold">{adminHealth.activeWarnings.length}</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-[#E8F5EE] bg-white shadow-sm lg:col-span-3">
+            <Card className="border-border bg-card shadow-sm lg:col-span-3">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 <CardDescription>Jump straight to the areas admins use most often.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="ghost" className="w-full justify-between rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]" onClick={() => navigate("/users/teachers")}>
+                <Button variant="ghost" className="w-full justify-between rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft" onClick={() => navigate("/users/teachers")}>
                   Check Teacher Assignments
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" className="w-full justify-between rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]" onClick={() => navigate("/subjects")}>
+                <Button variant="ghost" className="w-full justify-between rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft" onClick={() => navigate("/subjects")}>
                   Review Courses
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" className="w-full justify-between rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]" onClick={() => navigate("/results")}>
+                <Button variant="ghost" className="w-full justify-between rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft" onClick={() => navigate("/results")}>
                   Review Result Status
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" className="w-full justify-between rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]" onClick={() => navigate("/settings/academic-years")}>
+                <Button variant="ghost" className="w-full justify-between rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft" onClick={() => navigate("/settings/academic-years")}>
                   Manage Academic Session
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -567,7 +567,7 @@ export default function Dashboard() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-7">
-            <Card className="border-[#E8F5EE] bg-white shadow-sm lg:col-span-4">
+            <Card className="border-border bg-card shadow-sm lg:col-span-4">
               <CardHeader>
                 <CardTitle>Attention Needed</CardTitle>
                 <CardDescription>
@@ -576,18 +576,18 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {adminHealth.activeWarnings.length === 0 ? (
-                  <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4 text-sm text-muted-foreground">
+                  <div className="rounded-lg border border-border bg-surface-muted p-4 text-sm text-muted-foreground">
                     Everything looks healthy right now. Classes, teachers, students, and registrations are properly connected.
                   </div>
                 ) : (
                   adminHealth.activeWarnings.map((warning) => (
-                    <div key={warning.title} className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                    <div key={warning.title} className="rounded-lg border border-border bg-surface-muted p-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="space-y-1">
-                          <p className="font-semibold text-[#111111]">{warning.title}</p>
+                          <p className="font-semibold text-foreground">{warning.title}</p>
                           <p className="text-sm text-muted-foreground">{warning.detail}</p>
                         </div>
-                        <Badge className="bg-[#FFF4A3] text-[#111111] hover:bg-[#FFF4A3]">
+                        <Badge className="bg-accent-soft text-foreground hover:bg-accent-soft">
                           {warning.count}
                         </Badge>
                       </div>
@@ -597,7 +597,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#E8F5EE] bg-white shadow-sm lg:col-span-3">
+            <Card className="border-border bg-card shadow-sm lg:col-span-3">
               <CardHeader>
                 <CardTitle>Result Oversight</CardTitle>
                 <CardDescription>
@@ -606,12 +606,12 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {adminHealth.draftResults.length === 0 ? (
-                  <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4 text-sm text-muted-foreground">
+                  <div className="rounded-lg border border-border bg-surface-muted p-4 text-sm text-muted-foreground">
                     No draft results are currently waiting. Teachers have either not entered scores yet or results are already published.
                   </div>
                 ) : (
                   adminHealth.draftResults.slice(0, 5).map((item) => (
-                    <div key={item._id} className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3">
+                    <div key={item._id} className="rounded-lg border border-border bg-surface-muted p-3">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <p className="font-medium">{item.student?.name || "Unknown Student"}</p>
@@ -622,7 +622,7 @@ export default function Dashboard() {
                     </div>
                   ))
                 )}
-                <Button variant="ghost" className="w-full justify-between rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]" onClick={() => navigate("/results")}>
+                <Button variant="ghost" className="w-full justify-between rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft" onClick={() => navigate("/results")}>
                   Open Full Result Oversight
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -630,7 +630,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <Card className="border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="border-border bg-card shadow-sm">
             <CardHeader>
               <CardTitle>School Health Summary</CardTitle>
               <CardDescription>
@@ -638,25 +638,25 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-              <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Classes Without Teachers</p></div>
-                <p className="mt-3 text-2xl font-bold text-[#111111]">{adminHealth.classesWithoutTeachers.length}</p>
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Classes Without Teachers</p></div>
+                <p className="mt-3 text-2xl font-bold text-foreground">{adminHealth.classesWithoutTeachers.length}</p>
               </div>
-              <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Subjects Without Teachers</p></div>
-                <p className="mt-3 text-2xl font-bold text-[#111111]">{adminHealth.subjectsWithoutTeachers.length}</p>
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Subjects Without Teachers</p></div>
+                <p className="mt-3 text-2xl font-bold text-foreground">{adminHealth.subjectsWithoutTeachers.length}</p>
               </div>
-              <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Teachers Without Courses</p></div>
-                <p className="mt-3 text-2xl font-bold text-[#111111]">{adminHealth.teachersWithoutCourses.length}</p>
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Teachers Without Courses</p></div>
+                <p className="mt-3 text-2xl font-bold text-foreground">{adminHealth.teachersWithoutCourses.length}</p>
               </div>
-              <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Students Without Classes</p></div>
-                <p className="mt-3 text-2xl font-bold text-[#111111]">{adminHealth.studentsWithoutClasses.length}</p>
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Students Without Classes</p></div>
+                <p className="mt-3 text-2xl font-bold text-foreground">{adminHealth.studentsWithoutClasses.length}</p>
               </div>
-              <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Students Without Registration</p></div>
-                <p className="mt-3 text-2xl font-bold text-[#111111]">{adminHealth.studentsWithoutRegistration.length}</p>
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-semibold">Students Without Registration</p></div>
+                <p className="mt-3 text-2xl font-bold text-foreground">{adminHealth.studentsWithoutRegistration.length}</p>
               </div>
             </CardContent>
           </Card>
@@ -666,7 +666,7 @@ export default function Dashboard() {
       {user?.role === "teacher" && (
         <div className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-7">
-            <Card className="border-[#E8F5EE] bg-white shadow-sm lg:col-span-4">
+            <Card className="border-border bg-card shadow-sm lg:col-span-4">
               <CardHeader>
                 <CardTitle>My Courses</CardTitle>
                 <CardDescription>
@@ -675,27 +675,27 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                  <div className="rounded-lg border border-border bg-surface-muted p-4">
                     <p className="text-sm text-muted-foreground">Assigned Courses</p>
                     <p className="mt-2 text-2xl font-bold">{teacherCourseDetails.length}</p>
                   </div>
-                  <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                  <div className="rounded-lg border border-border bg-surface-muted p-4">
                     <p className="text-sm text-muted-foreground">Students In My Courses</p>
                     <p className="mt-2 text-2xl font-bold">{teacherRegisteredStudents.length}</p>
                   </div>
                 </div>
 
                 {teacherCourseDetails.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-[#E8F5EE] bg-[#E8F5EE] p-4 text-sm text-muted-foreground">
+                  <div className="rounded-lg border border-dashed border-border bg-surface-muted p-4 text-sm text-muted-foreground">
                     No course assignment yet. Once an admin assigns courses to this teacher, they will appear here.
                   </div>
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
                     {teacherCourseDetails.map((course) => (
-                      <div key={course.subject._id} className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                      <div key={course.subject._id} className="rounded-lg border border-border bg-surface-muted p-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div>
-                            <p className="font-semibold text-[#111111]">{course.subject.name}</p>
+                            <p className="font-semibold text-foreground">{course.subject.name}</p>
                             <p className="text-sm text-muted-foreground">
                               {course.subject.code} • {course.classes.length} class{course.classes.length === 1 ? "" : "es"}
                             </p>
@@ -717,23 +717,23 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#E8F5EE] bg-white shadow-sm lg:col-span-3">
+            <Card className="border-border bg-card shadow-sm lg:col-span-3">
               <CardHeader>
                 <CardTitle>Teaching Focus</CardTitle>
                 <CardDescription>See where to focus first before entering results.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3">
+                <div className="rounded-lg border border-border bg-surface-muted p-3">
                   <p className="font-medium">Current Session</p>
                   <p className="text-sm text-muted-foreground">{statsData.currentAcademicYear || "Not set"}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3">
+                <div className="rounded-lg border border-border bg-surface-muted p-3">
                   <p className="font-medium">Pending Registrations</p>
                   <p className="text-sm text-muted-foreground">
                     {statsData.pendingRegistrations || 0} student registration record(s) exist for this session.
                   </p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3">
+                <div className="rounded-lg border border-border bg-surface-muted p-3">
                   <p className="font-medium">Largest Teaching Load</p>
                   <p className="text-sm text-muted-foreground">
                     {teacherLargestCourse
@@ -743,7 +743,7 @@ export default function Dashboard() {
                 </div>
                 <Button
                   variant="ghost"
-                  className="w-full justify-between rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]"
+                  className="w-full justify-between rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft"
                   onClick={() => navigate("/results")}
                 >
                   Go To Result Entry
@@ -753,7 +753,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <Card className="border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="border-border bg-card shadow-sm">
             <CardHeader>
               <CardTitle>Registered Students In My Courses</CardTitle>
               <CardDescription>
@@ -762,16 +762,16 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {teacherCourseDetails.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-[#E8F5EE] bg-[#E8F5EE] p-6 text-sm text-muted-foreground">
+                <div className="rounded-lg border border-dashed border-border bg-surface-muted p-6 text-sm text-muted-foreground">
                   Your student list will appear here after courses are assigned and students register for them.
                 </div>
               ) : (
                 <div className="grid gap-4 lg:grid-cols-2">
                   {teacherCourseDetails.map((course) => (
-                    <div key={course.subject._id} className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                    <div key={course.subject._id} className="rounded-lg border border-border bg-surface-muted p-4">
                       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <p className="font-semibold text-[#111111]">{course.subject.name}</p>
+                          <p className="font-semibold text-foreground">{course.subject.name}</p>
                           <p className="text-sm text-muted-foreground">{course.subject.code}</p>
                         </div>
                         <Badge variant="outline">{course.students.length}</Badge>
@@ -801,25 +801,25 @@ export default function Dashboard() {
 
             {user?.role === "student" && studentDashboardState && (
         <div className="space-y-5">
-          <Card className="overflow-hidden border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="overflow-hidden border-border bg-card shadow-sm">
             <CardContent className="grid gap-6 p-0 lg:grid-cols-12">
-              <div className="bg-[linear-gradient(135deg,#E8F5EE_0%,#FFF9CC_100%)] p-6 lg:col-span-7 lg:p-8">
+              <div className="bg-primary-soft p-6 lg:col-span-7 lg:p-8">
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge className={registrationTone(statsData.registrationStatus)}>
                     {registrationLabel(statsData.registrationStatus)}
                   </Badge>
-                  <Badge variant="outline" className="border-[#E8F5EE] bg-white/80 text-[#111111]">
+                  <Badge variant="outline" className="border-border bg-card text-foreground">
                     {statsData.currentAcademicYear || "Current session not set"}
                   </Badge>
                 </div>
                 <div className="mt-5 max-w-2xl space-y-3">
-                  <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#4B5563]">
+                  <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
                     Student Command Center
                   </p>
-                  <h3 className="text-2xl font-bold tracking-tight text-[#111111] sm:text-3xl">
+                  <h3 className="text-xl font-semibold tracking-tight text-foreground">
                     Everything important about your school progress lives here.
                   </h3>
-                  <p className="text-sm leading-6 text-[#4B5563] sm:text-base">
+                  <p className="text-sm leading-6 text-muted-foreground sm:text-base">
                     Track registration, know your next action, and keep an eye on your published academic performance from one modern dashboard.
                   </p>
                 </div>
@@ -827,38 +827,40 @@ export default function Dashboard() {
                   <Button onClick={() => navigate(studentDashboardState.nextStep.actionPath)} className="w-full rounded-full sm:w-auto">
                     {studentDashboardState.nextStep.actionLabel}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-full border-[#E8F5EE] bg-white text-[#111111] hover:bg-[#E8F5EE] sm:w-auto"
-                    onClick={() => navigate("/results")}
-                  >
-                    Open Results
-                  </Button>
+                  {studentDashboardState.nextStep.actionPath !== "/results" && (
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-full border-border bg-card text-foreground hover:bg-surface-muted sm:w-auto"
+                      onClick={() => navigate("/results")}
+                    >
+                      Open Results
+                    </Button>
+                  )}
                 </div>
               </div>
               <div className="grid gap-3 p-6 lg:col-span-5 lg:grid-cols-2 lg:p-8">
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">GPA</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentResults?.summary?.gpa?.toFixed(2) || "0.00"}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentResults?.summary?.gpa?.toFixed(2) || "0.00"}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Published Results</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentDashboardState.publishedResultsCount}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentDashboardState.publishedResultsCount}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Selected Courses</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentDashboardState.totalSelectedCourses}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentDashboardState.totalSelectedCourses}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Passed Courses</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentDashboardState.passedCourses}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentDashboardState.passedCourses}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <div className="grid gap-4 xl:grid-cols-12">
-            <Card className="border-[#E8F5EE] bg-white shadow-sm xl:col-span-4">
+            <Card className="border-border bg-card shadow-sm xl:col-span-4">
               <CardHeader>
                 <CardTitle>Registration Journey</CardTitle>
                 <CardDescription>
@@ -867,10 +869,10 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {studentDashboardState.checklist.map((item) => (
-                  <div key={item.label} className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-3">
+                  <div key={item.label} className="rounded-lg border border-border bg-surface-muted p-3">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <p className="font-medium text-[#111111]">{item.label}</p>
+                        <p className="font-medium text-foreground">{item.label}</p>
                         <p className="text-sm text-muted-foreground">{item.help}</p>
                       </div>
                       <Badge className={item.done ? "brand-status-approved" : "brand-status-pending"}>
@@ -882,7 +884,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#E8F5EE] bg-white shadow-sm xl:col-span-4">
+            <Card className="border-border bg-card shadow-sm xl:col-span-4">
               <CardHeader>
                 <CardTitle>Academic Focus</CardTitle>
                 <CardDescription>
@@ -891,26 +893,26 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                  <div className="rounded-lg border border-border bg-surface-muted p-4">
                     <p className="text-sm text-muted-foreground">Needs Attention</p>
-                    <p className="mt-2 text-2xl font-bold text-[#111111]">{studentDashboardState.failedCourses}</p>
+                    <p className="mt-2 text-2xl font-bold text-foreground">{studentDashboardState.failedCourses}</p>
                   </div>
-                  <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                  <div className="rounded-lg border border-border bg-surface-muted p-4">
                     <p className="text-sm text-muted-foreground">Quality Points</p>
-                    <p className="mt-2 text-2xl font-bold text-[#111111]">{studentResults?.summary?.totalQualityPoints || 0}</p>
+                    <p className="mt-2 text-2xl font-bold text-foreground">{studentResults?.summary?.totalQualityPoints || 0}</p>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Best Performing Course</p>
-                  <p className="mt-2 text-lg font-bold text-[#111111]">
+                  <p className="mt-2 text-lg font-bold text-foreground">
                     {studentDashboardState.strongestCourse
                       ? `${studentDashboardState.strongestCourse.subject?.name || "Unknown Course"} (${studentDashboardState.strongestCourse.totalScore})`
                       : "No published course result yet"}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Course To Review First</p>
-                  <p className="mt-2 text-lg font-bold text-[#111111]">
+                  <p className="mt-2 text-lg font-bold text-foreground">
                     {studentDashboardState.courseNeedingAttention
                       ? `${studentDashboardState.courseNeedingAttention.subject?.name || "Unknown Course"} (${studentDashboardState.courseNeedingAttention.totalScore})`
                       : "No result data yet"}
@@ -924,7 +926,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#E8F5EE] bg-white shadow-sm xl:col-span-4">
+            <Card className="border-border bg-card shadow-sm xl:col-span-4">
               <CardHeader>
                 <CardTitle>Current Snapshot</CardTitle>
                 <CardDescription>
@@ -932,16 +934,16 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="rounded-2xl border border-[#FFD600] bg-[#FFF9CC] p-4">
-                  <p className="text-sm font-semibold text-[#111111]">Next Step</p>
-                  <p className="mt-2 text-lg font-bold text-[#111111]">{studentDashboardState.nextStep.title}</p>
-                  <p className="mt-2 text-sm text-[#111111]">{studentDashboardState.nextStep.detail}</p>
+                <div className="rounded-lg border border-accent bg-accent-soft p-4">
+                  <p className="text-sm font-semibold text-foreground">Next Step</p>
+                  <p className="mt-2 text-lg font-bold text-foreground">{studentDashboardState.nextStep.title}</p>
+                  <p className="mt-2 text-sm text-foreground">{studentDashboardState.nextStep.detail}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Class</p>
-                  <p className="mt-2 text-lg font-bold text-[#111111]">{statsData.studentClassName || "Not assigned"}</p>
+                  <p className="mt-2 text-lg font-bold text-foreground">{statsData.studentClassName || "Not assigned"}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Registered Course List</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {studentSelectedCourses.length === 0 ? (
@@ -954,7 +956,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 {availableStudentCourses === 0 && (
-                  <div className="rounded-2xl border border-dashed border-[#E8F5EE] bg-[#E8F5EE] p-4 text-sm text-muted-foreground">
+                  <div className="rounded-lg border border-dashed border-border bg-surface-muted p-4 text-sm text-muted-foreground">
                     Your class does not have any available courses yet. Contact the system administrator.
                   </div>
                 )}
@@ -962,7 +964,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          <Card className="border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="border-border bg-card shadow-sm">
             <CardHeader>
               <CardTitle>Latest Published Results</CardTitle>
               <CardDescription>
@@ -971,30 +973,30 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {recentStudentResults.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-[#E8F5EE] bg-[#E8F5EE] p-6 text-sm text-muted-foreground">
+                <div className="rounded-lg border border-dashed border-border bg-surface-muted p-6 text-sm text-muted-foreground">
                   No published results yet. Once your teachers submit scores and the admin publishes them, they will appear here.
                 </div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   {recentStudentResults.map((item) => (
-                    <div key={item._id} className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                    <div key={item._id} className="rounded-lg border border-border bg-surface-muted p-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="font-semibold text-[#111111]">{item.subject?.name}</p>
+                          <p className="font-semibold text-foreground">{item.subject?.name}</p>
                           <p className="text-sm text-muted-foreground">{item.subject?.code}</p>
                         </div>
                         <Badge variant={item.grade === "F" ? "destructive" : "secondary"}>{item.grade}</Badge>
                       </div>
                       <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
-                        <div className="rounded-xl bg-white p-2 text-center">
+                        <div className="rounded-xl bg-card p-2 text-center">
                           <p className="text-muted-foreground">CA</p>
                           <p className="font-semibold">{item.caScore}</p>
                         </div>
-                        <div className="rounded-xl bg-white p-2 text-center">
+                        <div className="rounded-xl bg-card p-2 text-center">
                           <p className="text-muted-foreground">Exam</p>
                           <p className="font-semibold">{item.examScore}</p>
                         </div>
-                        <div className="rounded-xl bg-white p-2 text-center">
+                        <div className="rounded-xl bg-card p-2 text-center">
                           <p className="text-muted-foreground">Total</p>
                           <p className="font-semibold">{item.totalScore}</p>
                         </div>

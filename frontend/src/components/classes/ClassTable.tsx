@@ -39,10 +39,10 @@ const ClassTable = ({
   totalPages,
 }: Props) => {
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-[#E8F5EE] bg-white shadow-[0_18px_35px_rgba(0,132,61,0.05)]">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="overflow-x-auto">
         <Table className="min-w-[720px]">
-          <TableHeader className="bg-[#E8F5EE]">
+          <TableHeader className="bg-surface-muted">
             <TableRow>
               <TableHead>Class</TableHead>
               <TableHead>Academic Year</TableHead>
@@ -67,7 +67,7 @@ const ClassTable = ({
             ) : (
               data.map((cls) => (
                 <TableRow key={cls._id}>
-                  <TableCell className="font-medium text-[#111111]">{cls.name}</TableCell>
+                  <TableCell className="font-medium text-foreground">{cls.name}</TableCell>
                   <TableCell>{cls.academicYear?.name || "N/A"}</TableCell>
                   <TableCell>
                     {cls.classTeacher ? (
@@ -77,19 +77,19 @@ const ClassTable = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1 text-[#4B5563]">
-                      <Users className="h-4 w-4 text-[#00843D]" />
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <Users className="h-4 w-4 text-primary" />
                       {cls.students?.length || 0} / {cls.capacity}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-[#FFF9CC]">
+                        <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-accent-soft">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-[#E8F5EE]">
+                      <DropdownMenuContent align="end" className="border-border">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => onEdit(cls)}>
                           <Pencil className="mr-2 h-4 w-4" /> Edit Details

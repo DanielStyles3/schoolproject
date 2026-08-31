@@ -82,14 +82,14 @@ const LoginForm = () => {
             disabled={pending}
           />
           <div className="flex justify-end">
-            <Link to="/forgot-password" className="text-sm font-semibold text-[#00843D] transition hover:text-[#006B31]">
+            <Link to="/forgot-password" className="text-sm font-semibold text-primary transition hover:text-primary-hover">
               Forgot password?
             </Link>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#E8F5EE] bg-[#F5F7FA] p-3">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#4B5563]">Demo login</p>
+        <div className="rounded-lg border border-border bg-surface-muted p-3">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">Demo login</p>
           <div className="grid gap-2 sm:grid-cols-3">
             {demoAccounts.map((account) => (
               <button
@@ -97,7 +97,7 @@ const LoginForm = () => {
                 type="button"
                 onClick={() => fillDemoAccount(account)}
                 disabled={pending}
-                className="rounded-full border border-[#E8F5EE] bg-white px-3 py-2 text-sm font-bold text-[#111111] transition hover:border-[#FFD600] hover:bg-[#FFF9CC] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-full border border-border bg-card px-3 py-2 text-sm font-bold text-foreground transition hover:border-accent hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {account.label}
               </button>
@@ -107,7 +107,7 @@ const LoginForm = () => {
 
         <Button
           type="submit"
-          className="h-11 w-full rounded-xl bg-[#00843D] text-white shadow-[0_18px_30px_rgba(0,132,61,0.18)] hover:bg-[#006B31]"
+          className="h-11 w-full rounded-xl bg-primary text-primary-foreground shadow-sm hover:bg-primary-hover"
           disabled={pending}
         >
           <LogIn className="mr-2 h-4 w-4" />

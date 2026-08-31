@@ -306,6 +306,7 @@ export default function Results() {
           api.post("/results", {
             studentId: item.studentId,
             subjectId: selectedSubject,
+            classId: selectedClass,
             academicYearId: year?._id,
             caScore: Number(item.caScore || 0),
             examScore: Number(item.examScore || 0),
@@ -470,7 +471,7 @@ export default function Results() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 rounded-[1.5rem] border border-[#E8F5EE] bg-white/70 p-6 text-[#4B5563] shadow-[0_18px_35px_rgba(0,132,61,0.05)]">
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-6 text-muted-foreground shadow-sm">
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
         Loading results and score summaries...
       </div>
@@ -478,9 +479,9 @@ export default function Results() {
   }
 
   return (
-    <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/60 p-4 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm sm:p-6">
+    <div className="space-y-6 rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#111111] sm:text-3xl">Results</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Results</h1>
         <p className="text-muted-foreground">
           {user?.role === "student"
             ? "View your published academic results."
@@ -490,80 +491,80 @@ export default function Results() {
 
       {user?.role === "student" && studentResultInsights && (
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="overflow-hidden border-[#E8F5EE] bg-white shadow-sm lg:col-span-2">
+          <Card className="overflow-hidden border-border bg-card shadow-sm lg:col-span-2">
             <CardContent className="grid gap-6 p-0 lg:grid-cols-12">
-              <div className="bg-[linear-gradient(135deg,#E8F5EE_0%,#FFF9CC_100%)] p-6 lg:col-span-7 lg:p-8">
-                <div className="flex items-center gap-2 text-[#4B5563]">
+              <div className="bg-primary-soft p-6 lg:col-span-7 lg:p-8">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Sparkles className="h-4 w-4" />
-                  <p className="text-sm font-medium uppercase tracking-[0.18em]">Published Academic Record</p>
+                  <p className="text-sm font-medium uppercase tracking-wide">Published Academic Record</p>
                 </div>
-                <h2 className="mt-5 text-2xl font-bold tracking-tight text-[#111111] sm:text-3xl">
+                <h2 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
                   A cleaner view of your academic progress.
                 </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4B5563] sm:text-base">
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
                   Check your GPA, strongest course, revision priority, and every published score from one student dashboard.
                 </p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-white/80 p-4">
+                  <div className="rounded-lg border border-border bg-card p-4">
                     <p className="text-sm text-muted-foreground">GPA</p>
-                    <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{summary?.gpa?.toFixed(2) || "0.00"}</p>
+                    <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{summary?.gpa?.toFixed(2) || "0.00"}</p>
                   </div>
-                  <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-white/80 p-4">
+                  <div className="rounded-lg border border-border bg-card p-4">
                     <p className="text-sm text-muted-foreground">Total Units</p>
-                    <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{summary?.totalUnits || 0}</p>
+                    <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{summary?.totalUnits || 0}</p>
                   </div>
-                  <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-white/80 p-4">
+                  <div className="rounded-lg border border-border bg-card p-4">
                     <p className="text-sm text-muted-foreground">Average Score</p>
-                    <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentResultInsights.averageScore}</p>
+                    <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentResultInsights.averageScore}</p>
                   </div>
                 </div>
               </div>
               <div className="grid gap-3 p-6 lg:col-span-5 lg:grid-cols-2 lg:p-8">
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Published Courses</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{summary?.totalCourses || 0}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{summary?.totalCourses || 0}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Passed Courses</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentResultInsights.passedCourses}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentResultInsights.passedCourses}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Merit Scores</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentResultInsights.meritCourses}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentResultInsights.meritCourses}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Need Attention</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{studentResultInsights.coursesNeedingAttention}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{studentResultInsights.coursesNeedingAttention}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="border-border bg-card shadow-sm">
             <CardHeader>
               <CardTitle>Performance Highlights</CardTitle>
               <CardDescription>Your current strongest and weakest published signals.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TrendingUp className="h-4 w-4" /><p className="text-sm font-medium">Strongest Course</p></div>
-                <p className="mt-3 text-lg font-bold text-[#111111]">
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TrendingUp className="h-4 w-4" /><p className="text-sm font-medium">Strongest Course</p></div>
+                <p className="mt-3 text-lg font-bold text-foreground">
                   {studentResultInsights.strongest
                     ? `${studentResultInsights.strongest.subject?.name || "Unknown Course"} (${studentResultInsights.strongest.totalScore})`
                     : "No published result yet"}
                 </p>
               </div>
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-medium">Course To Review Again</p></div>
-                <p className="mt-3 text-lg font-bold text-[#111111]">
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><TriangleAlert className="h-4 w-4" /><p className="text-sm font-medium">Course To Review Again</p></div>
+                <p className="mt-3 text-lg font-bold text-foreground">
                   {studentResultInsights.weakest
                     ? `${studentResultInsights.weakest.subject?.name || "Unknown Course"} (${studentResultInsights.weakest.totalScore})`
                     : "No result data yet"}
                 </p>
               </div>
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
-                <div className="flex items-center gap-2 text-[#111111]"><Target className="h-4 w-4" /><p className="text-sm font-medium">Quality Points</p></div>
-                <p className="mt-3 text-lg font-bold text-[#111111]">{summary?.totalQualityPoints || 0}</p>
+              <div className="rounded-lg border border-border bg-surface-muted p-4">
+                <div className="flex items-center gap-2 text-foreground"><Target className="h-4 w-4" /><p className="text-sm font-medium">Quality Points</p></div>
+                <p className="mt-3 text-lg font-bold text-foreground">{summary?.totalQualityPoints || 0}</p>
               </div>
             </CardContent>
           </Card>
@@ -572,47 +573,47 @@ export default function Results() {
 
       {user?.role !== "student" && teacherSummary && teacherFlowState && (
         <div className="space-y-4">
-          <Card className="overflow-hidden border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="overflow-hidden border-border bg-card shadow-sm">
             <CardContent className="grid gap-6 p-0 lg:grid-cols-12">
-              <div className="bg-[linear-gradient(135deg,#E8F5EE_0%,#FFF9CC_100%)] p-6 lg:col-span-7 lg:p-8">
-                <div className="flex items-center gap-2 text-[#4B5563]">
+              <div className="bg-primary-soft p-6 lg:col-span-7 lg:p-8">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Sparkles className="h-4 w-4" />
-                  <p className="text-sm font-medium uppercase tracking-[0.18em]">Teacher Result Entry</p>
+                  <p className="text-sm font-medium uppercase tracking-wide">Teacher Result Entry</p>
                 </div>
-                <h2 className="mt-5 text-2xl font-bold tracking-tight text-[#111111] sm:text-3xl">
+                <h2 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
                   Enter results only for the classes and courses assigned to you.
                 </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4B5563] sm:text-base">
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
                   Choose a class, select your course, record scores, save drafts, and publish only when the class sheet is complete.
                 </p>
-                <div className="mt-6 rounded-2xl border border-[#FFD600] bg-[#FFF9CC] p-4">
-                  <p className="text-sm font-semibold text-[#111111]">Current Step</p>
-                  <p className="mt-2 text-lg font-bold text-[#111111]">{teacherFlowState.title}</p>
-                  <p className="mt-2 text-sm text-[#111111]">{teacherFlowState.detail}</p>
+                <div className="mt-6 rounded-lg border border-accent bg-accent-soft p-4">
+                  <p className="text-sm font-semibold text-foreground">Current Step</p>
+                  <p className="mt-2 text-lg font-bold text-foreground">{teacherFlowState.title}</p>
+                  <p className="mt-2 text-sm text-foreground">{teacherFlowState.detail}</p>
                 </div>
               </div>
               <div className="grid gap-3 p-6 lg:col-span-5 lg:grid-cols-2 lg:p-8">
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Recorded Results</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{teacherSummary.totalRecords}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{teacherSummary.totalRecords}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Average Score</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{teacherSummary.averageScore}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{teacherSummary.averageScore}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Published</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{publishedResults.length}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{publishedResults.length}</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="rounded-lg border border-border bg-surface-muted p-4">
                   <p className="text-sm text-muted-foreground">Draft Results</p>
-                  <p className="mt-2 text-2xl font-bold text-[#111111] sm:text-3xl">{publishableResults.length}</p>
+                  <p className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{publishableResults.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#E8F5EE] bg-white shadow-sm">
+          <Card className="border-border bg-card shadow-sm">
             <CardHeader>
               <CardTitle>Pick Class And Course</CardTitle>
               <CardDescription>
@@ -628,7 +629,7 @@ export default function Results() {
                     setSelectedSubject("");
                   }}
                 >
-                  <SelectTrigger className="border-[#E8F5EE] bg-[#E8F5EE] text-[#111111]">
+                  <SelectTrigger className="border-border bg-surface-muted text-foreground">
                     <SelectValue placeholder="Select class" />
                   </SelectTrigger>
                   <SelectContent>
@@ -641,7 +642,7 @@ export default function Results() {
                 </Select>
 
                 <Select value={selectedSubject} onValueChange={setSelectedSubject} disabled={!selectedClass}>
-                  <SelectTrigger className="border-[#E8F5EE] bg-[#E8F5EE] text-[#111111]">
+                  <SelectTrigger className="border-border bg-surface-muted text-foreground">
                     <SelectValue placeholder="Select course" />
                   </SelectTrigger>
                   <SelectContent>
@@ -653,29 +654,29 @@ export default function Results() {
                   </SelectContent>
                 </Select>
 
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] px-4 py-3">
+                <div className="rounded-lg border border-border bg-surface-muted px-4 py-3">
                   <p className="text-sm text-muted-foreground">Registered Students</p>
-                  <p className="mt-1 text-xl font-bold text-[#111111]">{availableStudents.length}</p>
+                  <p className="mt-1 text-xl font-bold text-foreground">{availableStudents.length}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] px-4 py-3">
+                <div className="rounded-lg border border-border bg-surface-muted px-4 py-3">
                   <p className="text-sm text-muted-foreground">Unsaved Changes</p>
-                  <p className="mt-1 text-xl font-bold text-[#111111]">{changedRows.length}</p>
+                  <p className="mt-1 text-xl font-bold text-foreground">{changedRows.length}</p>
                 </div>
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] px-4 py-3">
+                <div className="rounded-lg border border-border bg-surface-muted px-4 py-3">
                   <p className="text-sm text-muted-foreground">Selected Course</p>
-                  <p className="mt-1 text-sm font-bold text-[#111111]">{teacherSelectedSubject?.code || "None yet"}</p>
+                  <p className="mt-1 text-sm font-bold text-foreground">{teacherSelectedSubject?.code || "None yet"}</p>
                 </div>
               </div>
 
               <div className="flex flex-col gap-2 sm:flex-row">
-                <Button onClick={saveBulkResults} disabled={saving || changedRows.length === 0} className="w-full rounded-2xl sm:w-auto">
+                <Button onClick={saveBulkResults} disabled={saving || changedRows.length === 0} className="w-full rounded-lg sm:w-auto">
                   {saving ? "Saving Drafts..." : "Save Changed Scores"}
                 </Button>
                 <Button
                   onClick={publishSelectedResults}
                   disabled={publishing || !!changedRows.length || publishableResults.length === 0}
                   variant="outline"
-                  className="w-full rounded-2xl border-[#00843D] text-[#00843D] hover:bg-[#eff9d6] sm:w-auto"
+                  className="w-full rounded-lg border-primary text-primary hover:bg-primary-soft sm:w-auto"
                 >
                   {publishing ? "Publishing..." : "Publish Course Results"}
                 </Button>
@@ -708,12 +709,12 @@ export default function Results() {
 
             {!!selectedSubject && availableStudents.length > 0 && (
               <CardContent className="space-y-4 pt-0">
-                <div className="rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4 text-sm text-muted-foreground">
+                <div className="rounded-lg border border-border bg-surface-muted p-4 text-sm text-muted-foreground">
                   Save rows as drafts first. Once you publish the course, students will be able to see only the published results.
                 </div>
-                <div className="overflow-x-auto rounded-[1.25rem] border border-[#E8F5EE]">
+                <div className="overflow-x-auto rounded-[1.25rem] border border-border">
                   <Table className="min-w-[760px]">
-                    <TableHeader className="bg-[#E8F5EE]">
+                    <TableHeader className="bg-surface-muted">
                       <TableRow>
                         <TableHead>Student</TableHead>
                         <TableHead>CA Score</TableHead>
@@ -744,7 +745,7 @@ export default function Results() {
                                 max="40"
                                 value={row.caScore}
                                 onChange={(event) => updateBulkScore(student._id, "caScore", event.target.value)}
-                                className="min-w-[110px] border-[#E8F5EE] bg-white text-[#111111]"
+                                className="min-w-[110px] border-border bg-card text-foreground"
                                 placeholder="0 - 40"
                               />
                             </TableCell>
@@ -755,14 +756,14 @@ export default function Results() {
                                 max="60"
                                 value={row.examScore}
                                 onChange={(event) => updateBulkScore(student._id, "examScore", event.target.value)}
-                                className="min-w-[110px] border-[#E8F5EE] bg-white text-[#111111]"
+                                className="min-w-[110px] border-border bg-card text-foreground"
                                 placeholder="0 - 60"
                               />
                             </TableCell>
                             <TableCell>{total}</TableCell>
                             <TableCell>
                               {isDirty ? (
-                                <Badge className="bg-[#FFF4A3] text-[#111111] hover:bg-[#FFF4A3]">Unsaved changes</Badge>
+                                <Badge className="bg-accent-soft text-foreground hover:bg-accent-soft">Unsaved changes</Badge>
                               ) : currentResult?.resultStatus === "published" ? (
                                 <Badge className="brand-status-approved">Published</Badge>
                               ) : currentResult ? (
@@ -790,7 +791,7 @@ export default function Results() {
         </div>
       )}
 
-      <Card className="border-[#E8F5EE] bg-white shadow-sm">
+      <Card className="border-border bg-card shadow-sm">
         <CardHeader>
           <CardTitle>{user?.role === "student" ? "Published Results" : "Recorded Results"}</CardTitle>
           <CardDescription>
@@ -815,9 +816,9 @@ export default function Results() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <div className="overflow-x-auto rounded-[1.25rem] border border-[#E8F5EE]">
+            <div className="overflow-x-auto rounded-[1.25rem] border border-border">
               <Table className="min-w-[760px]">
-                <TableHeader className="bg-[#E8F5EE]">
+                <TableHeader className="bg-surface-muted">
                   <TableRow>
                     {user?.role !== "student" && <TableHead>Student</TableHead>}
                     <TableHead>Course</TableHead>

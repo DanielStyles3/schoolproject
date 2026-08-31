@@ -34,16 +34,16 @@ const PrivateRoutes = () => {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[#E8F5EE] bg-white/90 px-4 py-3 backdrop-blur md:hidden">
+        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4B5563]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Dashboard Menu
             </p>
-            <p className="text-sm font-bold text-[#111111]">
+            <p className="text-sm font-bold text-foreground">
               {year?.name || "Academic Session"}
             </p>
           </div>
-          <SidebarTrigger className="h-10 w-10 rounded-full border border-[#E8F5EE] bg-[#E8F5EE] text-[#111111] hover:bg-[#FFF9CC]" />
+          <SidebarTrigger className="h-10 w-10 rounded-full border border-border bg-surface-muted text-foreground hover:bg-accent-soft" />
         </div>
         <Outlet />
       </SidebarInset>

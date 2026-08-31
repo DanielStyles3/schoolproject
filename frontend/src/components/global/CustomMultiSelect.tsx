@@ -44,12 +44,12 @@ export function CustomMultiSelect<T extends FieldValues>({
       control={control}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid} className="w-full">
-          <FieldLabel htmlFor={name} className="text-[#111111]">{label}</FieldLabel>
+          <FieldLabel htmlFor={name} className="text-foreground">{label}</FieldLabel>
           <MultiSelect onValuesChange={field.onChange} values={field.value || []}>
-            <MultiSelectTrigger className="min-h-11 w-full rounded-xl border-[#E8F5EE] bg-white text-sm text-[#111111] shadow-sm focus-visible:border-[#00843D] focus-visible:ring-[#00843D]/20" id={name} disabled={disabled || loading}>
+            <MultiSelectTrigger className="min-h-11 w-full rounded-xl border-border bg-card text-sm text-foreground shadow-sm focus-visible:border-primary focus-visible:ring-primary/20" id={name} disabled={disabled || loading}>
               <MultiSelectValue placeholder={placeholder} />
             </MultiSelectTrigger>
-            <MultiSelectContent className="max-h-72 border-[#E8F5EE] bg-white text-[#111111]">
+            <MultiSelectContent className="max-h-72 border-border bg-card text-foreground">
               <MultiSelectGroup>
                 {loading ? (
                   <div className="p-2 text-center text-sm text-muted-foreground">Loading options...</div>

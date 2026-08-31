@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course Registration — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>Course Registration</h1>
+              <p>Select the courses you want to register for this academic session.</p>
+            </div>
+            <div class="actions" id="head-status"></div>
+          </div>
+
+          <div id="notice"></div>
+
+          <div class="grid grid-4" id="summary"></div>
+
+          <div class="grid grid-2" id="main-grid">
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Available courses</h2>
+                  <p>These are the courses attached to your class.</p>
+                </div>
+              </div>
+              <div class="card-body" id="course-list"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Your selection</h2>
+                  <p>Review before submitting.</p>
+                </div>
+              </div>
+              <div class="card-body" id="selection"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth(["student"]))) return;
+
+    var user = Session.user;
+    var year = Session.year;
+
+    if (!year) {
+      $("#notice").innerHTML =
+        '<div class="alert alert-warn"><strong>No active session</strong>' +
+        "Registration opens once the college sets the current academic session.</div>";
+      hide($("#main-grid"));
+      pageReady();
+      return;
+    }
+
+    var ctx = await API.registrationContext(user, year.id);
+    if (ctx.error) {
+      $("#notice").innerHTML =
+        '<div class="alert alert-error"><strong>Cannot register yet</strong>' +
+        esc(errMessage(ctx.error)) + "</div>";
+      hide($("#main-grid"));
+      pageReady();
+      return;
+    }
+
+    var klass = ctx.data.klass;
+    var courses = ctx.data.courses;
+    var registration = ctx.data.registration;
+
+    // Pre-tick whatever the student already registered.
+    var selected = {};
+    (registration ? registration.subject_ids || [] : []).forEach(function (id) {
+      selected[id] = true;
+    });
+
+    var status = registration ? registration.status : "not_submitted";
+    $("#head-status").innerHTML = statusBadge(status);
+
+    $("#summary").innerHTML =
+      tile("Student", user.name) +
+      tile("Class", klass.name) +
+      tile("Session", year.name) +
+      tile("Courses available", String(courses.length));
+
+    function tile(label, value) {
+      return '<div class="stat"><div class="label">' + esc(label) + "</div>" +
+        '<div class="value" style="font-size:17px;line-height:1.35">' + esc(value) + "</div></div>";
+    }
+
+    renderCourses();
+    renderSelection();
+    pageReady();
+
+    function renderCourses() {
+      if (!courses.length) {
+        $("#course-list").innerHTML =
+          '<p class="table-empty">No courses have been attached to your class yet. ' +
+          "Contact the admin office.</p>";
+        return;
+      }
+
+      $("#course-list").innerHTML = courses.map(function (c) {
+        var on = !!selected[c.id];
+        return '<label class="checkbox-row' + (on ? " selected" : "") + '" data-id="' + esc(c.id) + '">' +
+          '<input type="checkbox"' + (on ? " checked" : "") + ' value="' + esc(c.id) + '">' +
+          "<span><strong>" + esc(c.name) + "</strong>" +
+          '<span class="code">' + esc(c.code) + "</span></span>" +
+          '<span class="meta"><span class="badge badge-grey">' + esc(c.unit) + " unit(s)</span></span>" +
+        "</label>";
+      }).join("");
+
+      $$("#course-list input").forEach(function (input) {
+        input.addEventListener("change", function () {
+          if (input.checked) selected[input.value] = true;
+          else delete selected[input.value];
+          input.closest(".checkbox-row").classList.toggle("selected", input.checked);
+          renderSelection();
+        });
+      });
+    }
+
+    function renderSelection() {
+      var chosen = courses.filter(function (c) { return selected[c.id]; });
+      var units = chosen.reduce(function (s, c) { return s + (Number(c.unit) || 0); }, 0);
+      var totalUnits = courses.reduce(function (s, c) { return s + (Number(c.unit) || 0); }, 0);
+
+      var warn = "";
+      if (chosen.length && units < totalUnits * 0.6) {
+        warn = '<div class="alert alert-warn"><strong>Light course load</strong>' +
+          "You have selected " + units + " of " + totalUnits +
+          " available units. Check you are not missing a required course.</div>";
+      }
+
+      $("#selection").innerHTML =
+        '<div class="grid grid-2" style="margin-bottom:16px">' +
+          '<div class="stat"><div class="label">Selected courses</div><div class="value">' + chosen.length + "</div></div>" +
+          '<div class="stat gold"><div class="label">Selected units</div><div class="value">' + units + "</div></div>" +
+        "</div>" +
+        warn +
+        (chosen.length
+          ? '<div class="table-wrap"><table class="data"><tbody>' +
+              chosen.map(function (c) {
+                return "<tr><td><strong>" + esc(c.code) + "</strong>" +
+                  '<span class="sub">' + esc(c.name) + "</span></td>" +
+                  '<td class="numeric">' + esc(c.unit) + "</td></tr>";
+              }).join("") +
+            "</tbody></table></div>"
+          : '<p class="table-empty">No courses selected yet.</p>') +
+        '<button class="btn btn-primary btn-block" id="btn-submit" style="margin-top:16px"' +
+          (chosen.length ? "" : " disabled") + ">" +
+          (registration ? "Update registration" : "Submit registration") +
+        "</button>" +
+        '<p class="field-hint" style="text-align:center;margin-top:10px">' +
+          (status === "approved"
+            ? "Your registration was approved. Submitting again sends it back for approval."
+            : "Once submitted, an administrator reviews and approves your selection.") +
+        "</p>";
+
+      var btn = $("#btn-submit");
+      if (btn) btn.addEventListener("click", submit);
+    }
+
+    async function submit() {
+      var ids = Object.keys(selected);
+      if (!ids.length) return;
+
+      var btn = $("#btn-submit");
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+
+      var res = await API.submitRegistration({
+        student_id: user.id,
+        class_id: klass.id,
+        academic_year_id: year.id,
+        subject_ids: ids,
+      });
+
+      if (res.error) {
+        toastErr(errMessage(res.error, "Could not save your registration"));
+        btn.disabled = false;
+        btn.textContent = registration ? "Update registration" : "Submit registration";
+        return;
+      }
+
+      registration = res.data;
+      status = res.data.status;
+      $("#head-status").innerHTML = statusBadge(status);
+      toastOk("Registration submitted. An administrator will review it.");
+      renderSelection();
+    }
+  })();
+  </script>
+</body>
+</html>

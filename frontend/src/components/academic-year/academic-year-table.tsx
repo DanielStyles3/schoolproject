@@ -41,9 +41,9 @@ const AcademicYearTable = ({
   totalPages,
 }: Props) => {
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-[#E8F5EE] bg-white shadow-[0_18px_35px_rgba(0,132,61,0.05)]">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <Table>
-        <TableHeader className="bg-[#E8F5EE]">
+        <TableHeader className="bg-surface-muted">
           <TableRow>
             <TableHead>Year Name</TableHead>
             <TableHead>Start Date</TableHead>
@@ -80,17 +80,17 @@ const AcademicYearTable = ({
                       Active
                     </Badge>
                   ) : (
-                    <Badge variant="secondary" className="border-[#E8F5EE] bg-[#E8F5EE] text-[#4B5563]">Inactive</Badge>
+                    <Badge variant="secondary" className="border-border bg-surface-muted text-muted-foreground">Inactive</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-[#FFF9CC]">
+                      <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-accent-soft">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="border-[#E8F5EE]">
+                    <DropdownMenuContent align="end" className="border-border">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem onClick={() => onEdit(year)}>
                         <Pencil className="mr-2 h-4 w-4" /> Edit

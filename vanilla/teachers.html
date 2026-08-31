@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lecturers — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1 id="page-title">Lecturers</h1>
+              <p id="page-sub"></p>
+            </div>
+            <div class="actions">
+              <div class="search-box"><input id="search" type="search" placeholder="Search by name or email…"></div>
+              <button class="btn btn-primary" id="btn-new">+ New</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Email</th><th id="th-extra"></th>
+                    <th>Status</th><th class="numeric">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    window.USERS_PAGE = {
+      role: "teacher",
+      title: "Lecturers",
+      description: "Teaching staff and the courses assigned to them.",
+    };
+  </script>
+  <script src="js/users-page.js"></script>
+</body>
+</html>

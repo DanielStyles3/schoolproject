@@ -1,8 +1,26 @@
 import LoginForm from "@/components/auth/LoginForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/AuthProvider";
-import { ArrowRight, BookOpenCheck, School2, ShieldCheck } from "lucide-react";
-import { Link, Navigate } from "react-router";
+import { BookOpenCheck, GraduationCap, ShieldCheck } from "lucide-react";
+import { Navigate } from "react-router";
+import BrandLockup from "@/components/global/BrandLockup";
+
+const highlights = [
+  {
+    icon: BookOpenCheck,
+    title: "Course registration",
+    description: "Students register their courses for the active session online.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Result management",
+    description: "Lecturers record CA and exam scores, then publish to students.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Role-based access",
+    description: "Students, lecturers, and admins each see their own workspace.",
+  },
+];
 
 const Login = () => {
   const { user, loading } = useAuth();
@@ -12,80 +30,81 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-svh overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(0,132,61,0.10),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,214,0,0.16),transparent_26%),linear-gradient(180deg,#F5F7FA_0%,#FFFFFF_100%)]">
-      <div className="mx-auto flex min-h-svh w-full max-w-6xl items-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1fr)_460px]">
-          <section className="hidden space-y-8 lg:block">
-            <Link to="/" className="inline-flex items-center gap-3 text-[#111111]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00843D] text-white shadow-[0_16px_28px_rgba(0,132,61,0.20)]">
-                <School2 className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#4B5563]">YabaTech Portal</p>
-                <p className="text-2xl font-black">Academic System</p>
-              </div>
-            </Link>
+    <div className="grid min-h-svh lg:grid-cols-[1.05fr_minmax(0,1fr)]">
+      {/* Institutional panel. The official logo ships on a #216015 field, which
+          is exactly --brand-deep, so the lockup sits flush with no plate. */}
+      <aside className="relative hidden overflow-hidden bg-brand-deep lg:flex lg:flex-col lg:justify-between lg:p-12">
+        {/* Kept flat behind the logo on purpose: the official artwork has a
+            baked-in #216015 field, so any gradient here would reveal it as a
+            rectangle. Decoration stays low and to the right, clear of it. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-40 -right-24 h-[28rem] w-[28rem] rounded-full bg-primary-bright/10 blur-3xl"
+        />
 
-            <div className="space-y-4">
-              <p className="inline-flex rounded-full border border-[#FFD600] bg-[#FFF9CC] px-4 py-2 text-sm font-semibold text-[#111111]">
-                Course registration and result checking
-              </p>
-              <h1 className="max-w-2xl text-4xl font-black leading-tight text-[#111111] sm:text-5xl">
-                Sign in to continue your school workflow.
-              </h1>
-              <p className="max-w-xl text-lg leading-8 text-[#4B5563]">
-                Use the account created by the school admin to open your dashboard, manage courses,
-                enter results, or check published grades.
-              </p>
-            </div>
+        <BrandLockup tone="light" size="lg" className="relative" />
 
-            <div className="grid max-w-xl gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-[#E8F5EE] bg-white p-4 shadow-[0_16px_32px_rgba(0,132,61,0.07)]">
-                <BookOpenCheck className="mb-3 h-5 w-5 text-[#00843D]" />
-                <p className="font-bold text-[#111111]">Course and result tools</p>
-                <p className="mt-1 text-sm leading-6 text-[#4B5563]">One portal for student and teacher academic tasks.</p>
-              </div>
-              <div className="rounded-2xl border border-[#E8F5EE] bg-white p-4 shadow-[0_16px_32px_rgba(0,132,61,0.07)]">
-                <ShieldCheck className="mb-3 h-5 w-5 text-[#00843D]" />
-                <p className="font-bold text-[#111111]">Role-based access</p>
-                <p className="mt-1 text-sm leading-6 text-[#4B5563]">Students, teachers, and admins see the right workspace.</p>
-              </div>
-            </div>
-          </section>
+        <div className="relative space-y-8">
+          <div className="space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+              Academic Portal
+            </p>
+            <h1 className="max-w-md text-4xl font-semibold leading-[1.15] tracking-tight text-white">
+              Course registration and result management, in one place.
+            </h1>
+            <p className="max-w-md text-base leading-7 text-white/70">
+              Sign in with the account issued by the college administrator to open
+              your dashboard.
+            </p>
+          </div>
 
-          <Card className="w-full max-w-[560px] justify-self-center overflow-hidden border-[#E8F5EE] bg-white shadow-[0_30px_70px_rgba(0,132,61,0.12)] lg:max-w-none">
-            <CardHeader className="space-y-3 border-b border-[#E8F5EE] bg-[#F5F7FA] px-5 py-6 sm:px-6">
-              <div className="lg:hidden">
-                <Link to="/" className="mb-4 inline-flex items-center gap-3 text-[#111111]">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#00843D] text-white">
-                    <School2 className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#4B5563]">YabaTech Portal</p>
-                    <p className="text-lg font-black">Academic System</p>
-                  </div>
-                </Link>
-              </div>
-              <CardTitle className="text-3xl font-black text-[#111111]">Sign In</CardTitle>
-              <CardDescription className="text-base leading-7 text-[#4B5563]">
-                Enter your school account details to access your dashboard.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 px-5 py-6 sm:px-6">
-              <LoginForm />
-
-              <div className="rounded-2xl border border-[#E8F5EE] bg-[#F5F7FA] p-4 text-center text-sm leading-6 text-[#4B5563]">
-                Student and teacher accounts are created by the school admin.
-              </div>
-
-              <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#00843D] hover:text-[#006B31]">
-                Back to homepage
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </CardContent>
-          </Card>
+          <ul className="max-w-md space-y-3">
+            {highlights.map((item) => (
+              <li
+                key={item.title}
+                className="flex gap-4 rounded-xl border border-white/10 bg-white/[0.06] p-4"
+              >
+                <item.icon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                <div>
+                  <p className="font-medium text-white">{item.title}</p>
+                  <p className="mt-0.5 text-sm leading-6 text-white/65">
+                    {item.description}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+
+        <p className="relative text-sm text-white/50">
+          <span className="font-medium text-white/70">Labore et Veritate</span>
+          <span className="mx-2">·</span>
+          Established 1947
+        </p>
+      </aside>
+
+      {/* Sign-in column */}
+      <main className="flex items-center justify-center bg-background px-4 py-10 sm:px-8">
+        <div className="w-full max-w-[420px]">
+          <BrandLockup size="md" className="mb-8 lg:hidden" />
+
+          <div className="mb-8 space-y-2">
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground">
+              Sign in
+            </h2>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Enter your college account details to access your dashboard.
+            </p>
+          </div>
+
+          <LoginForm />
+
+          <p className="mt-8 border-t border-border pt-6 text-sm leading-6 text-muted-foreground">
+            Student and lecturer accounts are created by the college
+            administrator. Contact the admin office if you cannot sign in.
+          </p>
+        </div>
+      </main>
     </div>
   );
 };

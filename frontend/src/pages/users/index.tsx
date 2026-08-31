@@ -9,6 +9,7 @@ import { Plus } from "lucide-react";
 import { api } from "@/lib/api";
 import UserTable from "@/components/users/UserTable";
 import UserDialog from "@/components/users/UserDialog";
+import PageShell from "@/components/global/PageShell";
 
 interface Props {
   role: UserRole;
@@ -93,20 +94,19 @@ export default function UserManagementPage({
   const addButtonLabel = role === "teacher" ? "Add New Teacher" : `Add ${roleLabel}`;
 
   return (
-    <div className="space-y-6 rounded-[2rem] border border-[#E8F5EE] bg-white/60 p-4 shadow-[0_24px_50px_rgba(0,132,61,0.05)] backdrop-blur-sm sm:p-6">
-      <div className="flex flex-col gap-4 rounded-[1.5rem] border border-[#E8F5EE] bg-[#E8F5EE] p-4 sm:p-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight capitalize sm:text-3xl">{title}</h1>
-          <p className="text-muted-foreground">{description}</p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
+    <PageShell
+      title={title}
+      description={description}
+      actions={
+        <>
           <Search search={search} setSearch={setSearch} title={`${role}s`} />
           <Button className="w-full sm:w-auto" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             {addButtonLabel}
           </Button>
-        </div>
-      </div>
+        </>
+      }
+    >
 
       <UserTable
         role={role}
@@ -136,7 +136,7 @@ export default function UserManagementPage({
         title="Delete User?"
         description="This will permanently delete this user from the system."
       />
-    </div>
+    </PageShell>
   );
 }
 

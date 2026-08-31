@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, MailCheck, School2 } from "lucide-react";
+import { ArrowLeft, MailCheck } from "lucide-react";
 import { Link, Navigate } from "react-router";
 import { toast } from "sonner";
 
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/AuthProvider";
 import { api } from "@/lib/api";
+import BrandLockup from "@/components/global/BrandLockup";
 
 const ForgotPassword = () => {
   const { user, loading } = useAuth();
@@ -39,52 +40,39 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-svh overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(10,143,47,0.10),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(244,196,48,0.12),transparent_26%),#f8fff7]">
-      <div className="mx-auto flex min-h-svh w-full max-w-6xl items-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1fr)_460px]">
+    <div className="min-h-svh overflow-x-hidden bg-background">
+      <div className="mx-auto flex min-h-svh w-full max-w-5xl items-center px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_420px]">
           <section className="hidden space-y-8 lg:block">
-            <Link to="/" className="inline-flex items-center gap-3 text-[#111111]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00843D] text-white shadow-[0_14px_24px_rgba(10,143,47,0.16)]">
-                <School2 className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#111111]">
-                  YabaTech Project
-                </p>
-                <p className="text-2xl font-black">Academic System</p>
-              </div>
-            </Link>
+            <BrandLockup size="md" />
 
-            <div className="space-y-4">
-              <p className="inline-flex rounded-full border border-[#d7ec9d] bg-[#eff9d6] px-4 py-2 text-sm font-semibold text-[#315214]">
-                Account recovery
-              </p>
-              <h1 className="max-w-2xl text-4xl font-black leading-tight text-[#111111] sm:text-5xl">
-                Reset access without stress.
+            <div className="space-y-3">
+              <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-foreground">
+                Reset your account access
               </h1>
-              <p className="max-w-xl text-lg leading-8 text-[#4f4f4f]">
+              <p className="max-w-lg text-base leading-7 text-muted-foreground">
                 Enter your school email and we will send secure reset instructions so you can get
                 back into your dashboard.
               </p>
             </div>
           </section>
 
-          <Card className="w-full max-w-[520px] justify-self-center border-[#dfe8d8] bg-white shadow-[0_30px_70px_rgba(0,132,61,0.10)] lg:max-w-none">
-            <CardHeader className="space-y-3 border-b border-[#eef2ea] bg-[#fcfffb] px-5 py-6 sm:px-6">
-              <CardTitle className="flex items-center gap-3 text-3xl font-black text-[#111111]">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#eff9d6] text-[#00843D]">
+          <Card className="w-full max-w-[480px] justify-self-center gap-0 overflow-hidden border-border bg-card py-0 shadow-sm lg:max-w-none">
+            <CardHeader className="space-y-3 border-b border-border bg-surface-muted px-5 py-6 sm:px-6">
+              <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-foreground">
+                <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-soft text-primary">
                   <MailCheck className="h-5 w-5" />
                 </span>
                 Forgot Password
               </CardTitle>
-              <CardDescription className="text-base leading-7 text-[#4f4f4f]">
+              <CardDescription className="text-sm leading-6 text-muted-foreground">
                 We will email a reset link to the address attached to your account.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 px-5 py-6 sm:px-6">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-semibold text-[#1e1e1e]">
+                  <Label htmlFor="email" className="text-sm font-semibold text-foreground">
                     School Email
                   </Label>
                   <Input
@@ -93,7 +81,7 @@ const ForgotPassword = () => {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="student@yabatech.local"
-                    className="h-11 border-[#E8F5EE] bg-white text-[#111111] placeholder:text-[#4B5563] focus-visible:border-[#FFD600] focus-visible:ring-[#FFD600]/40"
+                    className="h-11 border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/30"
                     disabled={pending}
                     required
                   />
@@ -101,7 +89,7 @@ const ForgotPassword = () => {
 
                 <Button
                   type="submit"
-                  className="h-11 w-full rounded-xl bg-[#00843D] text-white shadow-[0_18px_30px_rgba(0,132,61,0.18)] hover:bg-[#006B31]"
+                  className="h-11 w-full bg-primary text-primary-foreground hover:bg-primary-hover"
                   disabled={pending}
                 >
                   {pending ? "Sending reset link..." : "Send Reset Link"}
@@ -110,7 +98,7 @@ const ForgotPassword = () => {
 
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[#00843D] transition hover:text-[#006B31]"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary-hover"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to sign in

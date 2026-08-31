@@ -1,0 +1,131 @@
+ <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in — YABATECH Student Result Portal</title>
+  <meta name="description" content="Student Result Portal for Yaba College of Technology — course registration and result checking.">
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="auth-body">
+
+  <main class="auth-card">
+    <div class="auth-inner">
+      <img class="auth-logo" src="assets/yabatech-logo.png"
+           alt="Yaba College of Technology" width="168" height="50">
+
+      <h1 class="auth-title">Student Result Portal</h1>
+      <p class="auth-subtitle">Yaba College of Technology</p>
+
+      <form class="auth-form" id="login-form" novalidate>
+        <div class="field">
+          <label for="identifier">Matric Number</label>
+          <input type="text" id="identifier" name="identifier"
+                 placeholder="D/ND/23/3210359"
+                 autocomplete="username" autocapitalize="characters" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password"
+                 placeholder="Enter your password"
+                 autocomplete="current-password" required>
+        </div>
+
+        <p class="field-error hidden" id="login-error" role="alert"></p>
+
+        <button type="submit" class="btn btn-primary btn-block" id="btn-login">
+          Sign in
+        </button>
+
+        <div class="auth-links">
+          <a href="forgot-password.html">Forgot password?</a>
+          <a href="verify-result.html">Verify a result</a>
+        </div>
+
+        <p class="auth-divider">
+          Staff sign in with their college email address.
+        </p>
+
+        <!-- Demo shortcuts. Delete this block before a live deployment. -->
+        <div class="demo-box">
+          <p>Demo login</p>
+          <div class="demo-row">
+            <button type="button" data-email="admin@yabatech.local">Admin</button>
+            <button type="button" data-email="teacher@yabatech.local">Lecturer</button>
+            <button type="button" data-email="student@yabatech.local">Student</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="auth-footer">
+      Powered by the Student Result Management System
+    </div>
+  </main>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (function () {
+      var form = $("#login-form");
+      var btn = $("#btn-login");
+      var errBox = $("#login-error");
+
+      // Already signed in? Go straight through.
+      db.auth.getSession().then(function (res) {
+        if (res.data && res.data.session) window.location.replace("dashboard.html");
+      });
+
+      if (queryParam("disabled")) {
+        errBox.textContent = "That account has been deactivated. Contact the admin office.";
+        show(errBox);
+      }
+
+      // Demo buttons fill both fields so the form can be inspected before submit.
+      $$(".demo-row button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          $("#identifier").value = b.getAttribute("data-email");
+          $("#password").value = "ChangeMe123!";
+          hide(errBox);
+        });
+      });
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        hide(errBox);
+
+        var identifier = $("#identifier").value.trim();
+        var password = $("#password").value;
+
+        if (!identifier || !password) {
+          errBox.textContent = "Enter your matric number and password.";
+          show(errBox);
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Signing in…";
+
+        var result = await signIn(identifier, password);
+
+        if (result.error) {
+          errBox.textContent = result.error;
+          show(errBox);
+          btn.disabled = false;
+          btn.textContent = "Sign in";
+          return;
+        }
+
+        window.location.href = "dashboard.html";
+      });
+    })();
+  </script>
+</body>
+</html>

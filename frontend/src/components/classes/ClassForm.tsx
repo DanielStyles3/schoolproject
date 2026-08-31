@@ -192,7 +192,7 @@ const ClassForm = ({ open, onOpenChange, initialData, onSuccess }: Props) => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="capacity">Max Capacity</FieldLabel>
-                  <Input id="capacity" type="number" className="border-[#E8F5EE] bg-white text-[#111111]" {...field} />
+                  <Input id="capacity" type="number" className="border-border bg-card text-foreground" {...field} />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

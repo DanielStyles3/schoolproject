@@ -79,12 +79,12 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[#E8F5EE] bg-white p-0 shadow-[0_30px_70px_rgba(0,132,61,0.10)] sm:max-w-2xl">
-        <DialogHeader className="border-b border-[#E8F5EE] bg-[#E8F5EE] px-6 py-5 text-left">
-          <DialogTitle className="text-2xl font-black text-[#111111]">
+      <DialogContent className="border-border bg-card p-0 shadow-sm sm:max-w-2xl">
+        <DialogHeader className="border-b border-border bg-surface-muted px-6 py-5 text-left">
+          <DialogTitle className="text-2xl font-semibold text-foreground">
             {initialData ? "Edit Year" : "New Academic Year"}
           </DialogTitle>
-          <DialogDescription className="text-sm leading-6 text-[#4B5563]">
+          <DialogDescription className="text-sm leading-6 text-muted-foreground">
             Set the duration for this session.
           </DialogDescription>
         </DialogHeader>
@@ -111,7 +111,7 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full justify-start rounded-xl border-[#E8F5EE] bg-white pl-3 text-left font-normal text-[#111111]",
+                            "w-full justify-start rounded-xl border-border bg-card pl-3 text-left font-normal text-foreground",
                             !field.value && "text-muted-foreground",
                           )}
                         >
@@ -119,7 +119,7 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto border-[#E8F5EE] p-0" align="start">
+                      <PopoverContent className="w-auto border-border p-0" align="start">
                         <Calendar mode="single" selected={field.value} onSelect={field.onChange} autoFocus />
                       </PopoverContent>
                     </Popover>
@@ -139,7 +139,7 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full justify-start rounded-xl border-[#E8F5EE] bg-white pl-3 text-left font-normal text-[#111111]",
+                            "w-full justify-start rounded-xl border-border bg-card pl-3 text-left font-normal text-foreground",
                             !field.value && "text-muted-foreground",
                           )}
                         >
@@ -147,7 +147,7 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto border-[#E8F5EE] p-0" align="start">
+                      <PopoverContent className="w-auto border-border p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -168,7 +168,7 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
               control={form.control}
               render={({ field: { value, onChange, ...field } }) => (
                 <Field>
-                  <div className="flex gap-3 rounded-2xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                  <div className="flex gap-3 rounded-lg border border-border bg-surface-muted p-4">
                     <Checkbox id="isCurrent" checked={value} onCheckedChange={onChange} {...field} />
                     <div className="space-y-1 leading-none">
                       <FieldLabel htmlFor="isCurrent" className="cursor-pointer">
@@ -184,7 +184,7 @@ const AcademicYearForm = ({ open, onOpenChange, initialData, onSuccess }: Props)
             />
           </FieldGroup>
 
-          <DialogFooter className="border-t border-[#E8F5EE] pt-5">
+          <DialogFooter className="border-t border-border pt-5">
             <Button type="submit" disabled={pending} className="w-full rounded-full sm:w-auto sm:min-w-40">
               {pending ? "Saving..." : "Save Changes"}
             </Button>

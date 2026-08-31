@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Courses — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>Courses</h1>
+              <p>Courses available for registration and result entry.</p>
+            </div>
+            <div class="actions">
+              <div class="search-box"><input id="search" type="search" placeholder="Search courses…"></div>
+              <button class="btn btn-primary" id="btn-new">+ New course</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Code</th><th>Course title</th>
+                    <th class="center">Units</th>
+                    <th>Lecturer(s)</th><th>Status</th>
+                    <th class="numeric">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth(["admin"]))) return;
+
+    var tbody = $("#rows");
+    var teachers = [];
+    var teacherMap = {};
+
+    var tRes = await API.listUsers("teacher");
+    teachers = tRes.data || [];
+    teacherMap = byId(teachers);
+
+    $("#search").addEventListener("input", debounce(load, 350));
+    $("#btn-new").addEventListener("click", function () { openForm(null); });
+
+    await load();
+    pageReady();
+
+    async function load() {
+      tableLoading(tbody, 6);
+      var res = await API.listCourses($("#search").value.trim());
+      if (res.error) { tableEmpty(tbody, 6, errMessage(res.error)); return; }
+
+      var rows = res.data || [];
+      if (!rows.length) { tableEmpty(tbody, 6, "No courses found."); return; }
+
+      tbody.innerHTML = rows.map(function (c) {
+        var names = (c.teacher || [])
+          .map(function (id) { return teacherMap[id] ? teacherMap[id].name : null; })
+          .filter(Boolean);
+        return "<tr>" +
+          "<td><strong>" + esc(c.code) + "</strong></td>" +
+          "<td>" + esc(c.name) + "</td>" +
+          '<td class="center">' + esc(c.unit) + "</td>" +
+          "<td>" + (names.length ? esc(names.join(", ")) :
+            '<span class="badge badge-gold">Unassigned</span>') + "</td>" +
+          "<td>" + (c.is_active === false
+            ? '<span class="badge badge-grey">Inactive</span>'
+            : '<span class="badge badge-green">Active</span>') + "</td>" +
+          '<td class="numeric">' +
+            '<button class="btn btn-outline btn-sm" data-edit="' + esc(c.id) + '">Edit</button> ' +
+            '<button class="btn btn-outline btn-sm" data-del="' + esc(c.id) + '">Delete</button>' +
+          "</td></tr>";
+      }).join("");
+
+      $$("[data-edit]", tbody).forEach(function (b) {
+        b.addEventListener("click", function () {
+          openForm(rows.find(function (r) { return r.id === b.getAttribute("data-edit"); }));
+        });
+      });
+
+      $$("[data-del]", tbody).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var id = b.getAttribute("data-del");
+          var row = rows.find(function (r) { return r.id === id; });
+          confirmAction("Delete course",
+            'Delete "' + row.code + " — " + row.name + '"? Existing results for this course will also be removed.',
+            async function () {
+              var res = await API.deleteCourse(id);
+              if (res.error) { toastErr(errMessage(res.error)); return; }
+              toastOk("Course deleted");
+              load();
+            });
+        });
+      });
+    }
+
+    function openForm(row) {
+      var editing = !!row;
+      var backdrop = openModal(
+        editing ? "Edit course" : "New course",
+        '<div class="field"><label for="f-code">Course code</label>' +
+          '<input id="f-code" value="' + (editing ? esc(row.code) : "") + '" placeholder="CSC101"></div>' +
+        '<div class="field"><label for="f-name">Course title</label>' +
+          '<input id="f-name" value="' + (editing ? esc(row.name) : "") + '" placeholder="Introduction to Computing"></div>' +
+        '<div class="field"><label for="f-unit">Units</label>' +
+          '<input id="f-unit" type="number" min="1" max="12" value="' + (editing ? esc(row.unit) : "3") + '"></div>' +
+        '<div class="field"><label for="f-teacher">Lecturer</label>' +
+          '<select id="f-teacher"><option value="">Not assigned</option>' +
+            teachers.map(function (t) {
+              var on = editing && (row.teacher || []).indexOf(t.id) !== -1;
+              return '<option value="' + esc(t.id) + '"' + (on ? " selected" : "") + ">" +
+                esc(t.name) + "</option>";
+            }).join("") +
+          "</select></div>" +
+        '<div class="field"><label for="f-active">Status</label>' +
+          '<select id="f-active">' +
+            '<option value="true"' + (editing && row.is_active === false ? "" : " selected") + ">Active</option>" +
+            '<option value="false"' + (editing && row.is_active === false ? " selected" : "") + ">Inactive</option>" +
+          "</select></div>" +
+        '<p class="field-error hidden" id="f-err"></p>',
+        '<button class="btn btn-outline" id="f-cancel">Cancel</button>' +
+        '<button class="btn btn-primary" id="f-save">' + (editing ? "Save changes" : "Create course") + "</button>"
+      );
+
+      $("#f-cancel", backdrop).addEventListener("click", closeModal);
+      $("#f-save", backdrop).addEventListener("click", async function () {
+        var err = $("#f-err", backdrop);
+        var code = $("#f-code", backdrop).value.trim().toUpperCase();
+        var name = $("#f-name", backdrop).value.trim();
+        var unit = Number($("#f-unit", backdrop).value);
+        var teacher = $("#f-teacher", backdrop).value;
+
+        if (!code || !name) {
+          err.textContent = "Course code and title are both required.";
+          show(err); return;
+        }
+        if (!unit || unit < 1) {
+          err.textContent = "Units must be at least 1.";
+          show(err); return;
+        }
+
+        var payload = {
+          code: code,
+          name: name,
+          unit: unit,
+          teacher: teacher ? [teacher] : [],
+          is_active: $("#f-active", backdrop).value === "true",
+        };
+
+        var btn = $("#f-save", backdrop);
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        var res = editing ? await API.updateCourse(row.id, payload) : await API.createCourse(payload);
+        if (res.error) {
+          err.textContent = /duplicate|unique/i.test(res.error.message || "")
+            ? "That course code is already in use."
+            : errMessage(res.error);
+          show(err);
+          btn.disabled = false;
+          btn.textContent = editing ? "Save changes" : "Create course";
+          return;
+        }
+
+        closeModal();
+        toastOk(editing ? "Course updated" : "Course created");
+        load();
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

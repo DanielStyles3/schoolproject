@@ -26,20 +26,20 @@ const CustomAlert = ({
 }: Props) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent className="border-[#E8F5EE] bg-white shadow-[0_30px_70px_rgba(0,132,61,0.10)]">
+      <AlertDialogContent className="border-border bg-card shadow-sm">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-2xl font-black text-[#111111]">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-sm leading-6 text-[#4B5563]">
+          <AlertDialogTitle className="text-2xl font-semibold text-foreground">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm leading-6 text-muted-foreground">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="rounded-full border-[#E8F5EE] text-[#111111] hover:bg-[#E8F5EE]">
+          <AlertDialogCancel className="rounded-full border-border text-foreground hover:bg-surface-muted">
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            className="rounded-full bg-red-600 text-white hover:bg-red-700"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete
           </AlertDialogAction>

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard — YABATECH Student Result Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1 id="dash-title">Dashboard</h1>
+              <p id="dash-sub"></p>
+            </div>
+            <div class="actions" id="dash-actions"></div>
+          </div>
+
+          <div class="grid grid-4" id="stat-row"></div>
+          <div id="dash-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth())) return;
+
+    var user = Session.user;
+    var year = Session.year;
+    var yearId = year ? year.id : null;
+
+    $("#dash-title").textContent = titleCase(user.role) + " Dashboard";
+    $("#dash-sub").textContent =
+      "Welcome back, " + user.name + "." +
+      (year ? " Current session: " + year.name + "." : " No academic session is active yet.");
+
+    function stat(label, value, note, gold) {
+      return '<div class="stat' + (gold ? " gold" : "") + '">' +
+        '<div class="label">' + esc(label) + "</div>" +
+        '<div class="value">' + esc(value) + "</div>" +
+        (note ? '<div class="note">' + esc(note) + "</div>" : "") +
+      "</div>";
+    }
+
+    if (user.role === "admin") await renderAdmin();
+    else if (user.role === "teacher") await renderTeacher();
+    else await renderStudent();
+
+    pageReady();
+
+    /* ---------------------------------------------------------------- Admin */
+    async function renderAdmin() {
+      $("#dash-actions").innerHTML =
+        '<a class="btn btn-outline" href="students.html">Manage Students</a>' +
+        '<a class="btn btn-primary" href="registrations.html">Review Registrations</a>';
+
+      var students = await API.listUsers("student");
+      var teachers = await API.listUsers("teacher");
+      var courses = await API.listCourses();
+      var classes = await API.listClasses();
+      var regs = await API.listRegistrations({ academicYearId: yearId });
+      var results = await API.listResults({ academicYearId: yearId });
+
+      var regRows = regs.data || [];
+      var resultRows = results.data || [];
+      var pending = regRows.filter(function (r) { return r.status !== "approved"; });
+      var drafts = resultRows.filter(function (r) { return r.result_status !== "published"; });
+      var published = resultRows.filter(function (r) { return r.result_status === "published"; });
+
+      $("#stat-row").innerHTML =
+        stat("Students", (students.data || []).length, "Registered accounts") +
+        stat("Lecturers", (teachers.data || []).length, "Teaching staff") +
+        stat("Courses", (courses.data || []).length, "Available for registration") +
+        stat("Registrations", regRows.length, "This session");
+
+      // Which students have not registered at all this session?
+      var registeredIds = {};
+      regRows.forEach(function (r) { registeredIds[r.student_id] = true; });
+      var notRegistered = (students.data || []).filter(function (s) { return !registeredIds[s.id]; });
+
+      // Classes and courses missing a teacher are the usual setup gaps.
+      var classesNoTeacher = (classes.data || []).filter(function (c) { return !c.class_teacher; });
+      var coursesNoTeacher = (courses.data || []).filter(function (c) { return !(c.teacher || []).length; });
+      var studentsNoClass = (students.data || []).filter(function (s) { return !s.student_class; });
+
+      var attention = [
+        { label: "Registrations awaiting approval", count: pending.length, link: "registrations.html" },
+        { label: "Draft results not yet published", count: drafts.length, link: "results.html" },
+        { label: "Students with no class assigned", count: studentsNoClass.length, link: "students.html" },
+        { label: "Students yet to register courses", count: notRegistered.length, link: "students.html" },
+        { label: "Classes with no class teacher", count: classesNoTeacher.length, link: "classes.html" },
+        { label: "Courses with no lecturer", count: coursesNoTeacher.length, link: "courses.html" },
+      ].sort(function (a, b) { return b.count - a.count; });
+
+      $("#dash-body").innerHTML =
+        '<div class="grid grid-2">' +
+          '<div class="card">' +
+            '<div class="card-head"><div><h2>Needs attention</h2>' +
+              "<p>Setup gaps and pending work, most urgent first.</p></div></div>" +
+            '<div class="table-wrap"><table class="data"><tbody>' +
+              attention.map(function (a) {
+                return "<tr><td>" + esc(a.label) + "</td>" +
+                  '<td class="numeric"><span class="badge ' +
+                    (a.count ? "badge-gold" : "badge-green") + '">' + a.count + "</span></td>" +
+                  '<td class="numeric"><a href="' + a.link + '">Open</a></td></tr>';
+              }).join("") +
+            "</tbody></table></div>" +
+          "</div>" +
+
+          '<div class="card">' +
+            '<div class="card-head"><div><h2>Result status</h2>' +
+              "<p>Progress of score entry across the college.</p></div></div>" +
+            '<div class="card-body">' +
+              '<div class="grid grid-2">' +
+                stat("Published", published.length, "Visible to students") +
+                stat("Draft", drafts.length, "Not yet released", true) +
+              "</div>" +
+              '<p style="margin-top:16px;font-size:14px;color:var(--text-muted)">' +
+                "Results stay invisible to students until a lecturer publishes the course sheet." +
+              "</p>" +
+            "</div>" +
+          "</div>" +
+        "</div>";
+    }
+
+    /* -------------------------------------------------------------- Lecturer */
+    async function renderTeacher() {
+      $("#dash-actions").innerHTML =
+        '<a class="btn btn-primary" href="results.html">Enter Results</a>';
+
+      var myCourseIds = user.teacher_subject || [];
+      var courses = await API.getCoursesByIds(myCourseIds);
+      var myCourses = courses.data || [];
+
+      var results = await API.listResults({ academicYearId: yearId });
+      var mine = (results.data || []).filter(function (r) {
+        return myCourseIds.indexOf(r.subject_id) !== -1;
+      });
+      var drafts = mine.filter(function (r) { return r.result_status !== "published"; });
+      var published = mine.filter(function (r) { return r.result_status === "published"; });
+
+      var avg = mine.length
+        ? Math.round(mine.reduce(function (s, r) { return s + (Number(r.total_score) || 0); }, 0) / mine.length)
+        : 0;
+
+      $("#stat-row").innerHTML =
+        stat("My courses", myCourses.length, "Assigned to you") +
+        stat("Records entered", mine.length, "This session") +
+        stat("Published", published.length, "Released to students") +
+        stat("Draft", drafts.length, "Awaiting publication", true);
+
+      $("#dash-body").innerHTML =
+        '<div class="card">' +
+          '<div class="card-head"><div><h2>My courses</h2>' +
+            "<p>You can only record results for courses assigned to you.</p></div>" +
+            '<a class="btn btn-primary btn-sm" href="results.html">Go to results</a></div>' +
+          '<div class="table-wrap"><table class="data">' +
+            "<thead><tr><th>Code</th><th>Course</th><th>Units</th>" +
+            '<th class="numeric">Records</th></tr></thead><tbody>' +
+            (myCourses.length
+              ? myCourses.map(function (c) {
+                  var n = mine.filter(function (r) { return r.subject_id === c.id; }).length;
+                  return "<tr><td><strong>" + esc(c.code) + "</strong></td>" +
+                    "<td>" + esc(c.name) + "</td>" +
+                    "<td>" + esc(c.unit) + "</td>" +
+                    '<td class="numeric">' + n + "</td></tr>";
+                }).join("")
+              : '<tr><td colspan="4" class="table-empty">No courses have been assigned to you yet. ' +
+                "Contact the admin office.</td></tr>") +
+          "</tbody></table></div>" +
+          (mine.length ? '<div class="pagination">Average score across your records: <strong>' +
+            avg + "</strong></div>" : "") +
+        "</div>";
+    }
+
+    /* --------------------------------------------------------------- Student */
+    async function renderStudent() {
+      $("#dash-actions").innerHTML =
+        '<a class="btn btn-outline" href="course-registration.html">Register Courses</a>' +
+        '<a class="btn btn-primary" href="results.html">Check Results</a>';
+
+      if (!yearId) {
+        $("#stat-row").innerHTML = "";
+        $("#dash-body").innerHTML =
+          '<div class="alert alert-warn"><strong>No active session</strong>' +
+          "The college has not opened an academic session yet. Check back later.</div>";
+        return;
+      }
+
+      var reg = await API.getMyRegistration(user.id, yearId);
+      var registration = reg.data;
+      var transcript = await API.studentTranscript(user.id, yearId);
+      var t = transcript.data || { rows: [], summary: {} };
+
+      var regCount = registration ? (registration.subject_ids || []).length : 0;
+      var status = registration ? registration.status : "not_submitted";
+
+      $("#stat-row").innerHTML =
+        stat("Registered courses", regCount, "This session") +
+        stat("Published results", t.summary.courses || 0, "Released so far") +
+        stat("GPA", (t.summary.gpa || 0).toFixed(2), "Across published courses") +
+        stat("Total units", t.summary.units || 0, "Passed: " + (t.summary.passed || 0), true);
+
+      var steps = [
+        { label: "Class assigned", done: !!user.student_class,
+          detail: user.student_class ? "You belong to a class." : "Contact the admin office." },
+        { label: "Courses selected", done: regCount > 0,
+          detail: regCount ? regCount + " course(s) selected." : "No courses chosen yet." },
+        { label: "Registration approved", done: status === "approved",
+          detail: status === "approved" ? "Approved for this session."
+                : status === "submitted" ? "Submitted — waiting for admin approval."
+                : "Not submitted yet." },
+        { label: "Results published", done: (t.summary.courses || 0) > 0,
+          detail: (t.summary.courses || 0) + " result(s) available." },
+      ];
+
+      $("#dash-body").innerHTML =
+        '<div class="grid grid-2">' +
+          '<div class="card">' +
+            '<div class="card-head"><div><h2>Registration progress</h2>' +
+              "<p>Your path from course selection to published results.</p></div>" +
+              statusBadge(status) + "</div>" +
+            '<div class="table-wrap"><table class="data"><tbody>' +
+              steps.map(function (s) {
+                return "<tr><td><strong>" + esc(s.label) + "</strong>" +
+                  '<span class="sub">' + esc(s.detail) + "</span></td>" +
+                  '<td class="numeric"><span class="badge ' +
+                    (s.done ? "badge-green" : "badge-grey") + '">' +
+                    (s.done ? "Done" : "Pending") + "</span></td></tr>";
+              }).join("") +
+            "</tbody></table></div>" +
+          "</div>" +
+
+          '<div class="card">' +
+            '<div class="card-head"><div><h2>Latest published results</h2>' +
+              "<p>Scores your lecturers have released.</p></div>" +
+              '<a class="btn btn-outline btn-sm" href="results.html">View all</a></div>' +
+            '<div class="table-wrap"><table class="data">' +
+              "<thead><tr><th>Course</th><th>CA</th><th>Exam</th>" +
+              '<th class="numeric">Total</th><th>Grade</th></tr></thead><tbody>' +
+              (t.rows.length
+                ? t.rows.slice(0, 6).map(function (r) {
+                    return "<tr><td><strong>" + esc(r.code) + "</strong>" +
+                      '<span class="sub">' + esc(r.name) + "</span></td>" +
+                      "<td>" + r.caScore + "</td><td>" + r.examScore + "</td>" +
+                      '<td class="numeric"><strong>' + r.total + "</strong></td>" +
+                      '<td><span class="' + gradeBadgeClass(r.grade) + '">' + esc(r.grade) + "</span></td></tr>";
+                  }).join("")
+                : '<tr><td colspan="5" class="table-empty">No results have been published for you yet.</td></tr>') +
+            "</tbody></table></div>" +
+          "</div>" +
+        "</div>";
+    }
+  })();
+  </script>
+</body>
+</html>

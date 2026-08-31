@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>My Profile</h1>
+              <p>Update your details or set a new password.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-head"><div><h2>Account details</h2>
+                <p>Your role is set by the administrator and cannot be changed here.</p></div></div>
+              <div class="card-body">
+                <form id="profile-form">
+                  <div class="field">
+                    <label for="f-name">Full name</label>
+                    <input id="f-name" type="text">
+                  </div>
+                  <div class="field">
+                    <label for="f-email">Email address</label>
+                    <input id="f-email" type="email">
+                  </div>
+                  <div class="field">
+                    <label for="f-password">New password</label>
+                    <input id="f-password" type="password" placeholder="Leave blank to keep current password">
+                    <p class="field-hint">At least 8 characters.</p>
+                  </div>
+                  <p class="field-error hidden" id="f-err"></p>
+                  <button class="btn btn-primary" id="f-save" type="submit">Save changes</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><div><h2>Account summary</h2>
+                <p>Read-only information about your record.</p></div></div>
+              <div class="table-wrap">
+                <table class="data"><tbody id="summary"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth())) return;
+
+    var user = Session.user;
+    $("#f-name").value = user.name || "";
+    $("#f-email").value = user.email || "";
+
+    var extra = "";
+    if (user.role === "student") {
+      var cls = user.student_class ? await API.getClass(user.student_class) : null;
+      extra =
+        row("Matric number", user.matric_number || "Not set") +
+        row("Class", cls && cls.data ? cls.data.name : "Not assigned");
+    } else if (user.role === "teacher") {
+      var courses = await API.getCoursesByIds(user.teacher_subject || []);
+      var codes = (courses.data || []).map(function (c) { return c.code; });
+      extra = row("Courses assigned", codes.length ? codes.join(", ") : "None");
+    }
+
+    $("#summary").innerHTML =
+      row("Role", titleCase(user.role)) +
+      row("Current session", Session.year ? Session.year.name : "Not set") +
+      extra +
+      row("Account status", user.is_active === false ? "Inactive" : "Active");
+
+    function row(label, value) {
+      return "<tr><td><strong>" + esc(label) + "</strong></td><td>" + esc(value) + "</td></tr>";
+    }
+
+    pageReady();
+
+    $("#profile-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var err = $("#f-err");
+      hide(err);
+
+      var name = $("#f-name").value.trim();
+      var email = $("#f-email").value.trim();
+      var password = $("#f-password").value;
+
+      if (!name || !email) { err.textContent = "Name and email are required."; show(err); return; }
+      if (password && password.length < 8) {
+        err.textContent = "New password must be at least 8 characters.";
+        show(err); return;
+      }
+
+      var payload = { name: name, email: email };
+      if (password) payload.password = password;
+
+      var btn = $("#f-save");
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+
+      var res = await API.updateOwnProfile(payload);
+
+      btn.disabled = false;
+      btn.textContent = "Save changes";
+
+      if (res.error) {
+        err.textContent = errMessage(res.error, "Could not update your profile");
+        show(err);
+        return;
+      }
+
+      $("#f-password").value = "";
+      toastOk("Profile updated");
+      // Name shows in the sidebar, so refresh it.
+      Session.user.name = name;
+      Session.user.email = email;
+      renderShell();
+    });
+  })();
+  </script>
+</body>
+</html>

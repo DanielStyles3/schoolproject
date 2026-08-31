@@ -24,17 +24,17 @@ const Modal = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[90vh] overflow-hidden border-[#E8F5EE] bg-white p-0 shadow-[0_30px_70px_rgba(0,132,61,0.10)] sm:max-w-2xl">
-        <DialogHeader className="border-b border-[#E8F5EE] bg-[#E8F5EE] px-4 py-4 text-left sm:px-6 sm:py-5">
-          <DialogTitle className="text-xl font-black text-[#111111] sm:text-2xl">{title}</DialogTitle>
-          <DialogDescription className="text-sm leading-6 text-[#4B5563]">
+      <DialogContent className="max-h-[90vh] overflow-hidden border-border bg-card p-0 shadow-sm sm:max-w-2xl">
+        <DialogHeader className="border-b border-border bg-surface-muted px-4 py-4 text-left sm:px-6 sm:py-5">
+          <DialogTitle className="text-xl font-semibold text-foreground sm:text-2xl">{title}</DialogTitle>
+          <DialogDescription className="text-sm leading-6 text-muted-foreground">
             {description}
           </DialogDescription>
         </DialogHeader>
         <div className="overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">{children}</div>
-        <DialogFooter className="border-t border-[#E8F5EE] bg-[#F5F7FA] px-4 py-4 sm:justify-end sm:px-6">
+        <DialogFooter className="border-t border-border bg-surface-muted px-4 py-4 sm:justify-end sm:px-6">
           <DialogClose asChild>
-            <Button variant="outline" className="w-full rounded-full border-[#E8F5EE] bg-white text-[#111111] hover:bg-[#FFF9CC] sm:w-auto">
+            <Button variant="outline" className="w-full rounded-full border-border bg-card text-foreground hover:bg-accent-soft sm:w-auto">
               Cancel
             </Button>
           </DialogClose>

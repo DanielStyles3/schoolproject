@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Classes — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>Classes</h1>
+              <p>Class groups, their class teacher, and the courses attached to them.</p>
+            </div>
+            <div class="actions">
+              <div class="search-box"><input id="search" type="search" placeholder="Search classes…"></div>
+              <button class="btn btn-primary" id="btn-new">+ New class</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Class</th><th>Class teacher</th>
+                    <th class="center">Courses</th>
+                    <th class="center">Students</th>
+                    <th class="center">Capacity</th>
+                    <th class="numeric">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    if (!(await requireAuth(["admin"]))) return;
+
+    var tbody = $("#rows");
+    var teachers = (await API.listUsers("teacher")).data || [];
+    var teacherMap = byId(teachers);
+    var courses = (await API.listCourses()).data || [];
+    var courseMap = byId(courses);
+    var years = (await API.listYears()).data || [];
+
+    $("#search").addEventListener("input", debounce(load, 350));
+    $("#btn-new").addEventListener("click", function () { openForm(null); });
+
+    await load();
+    pageReady();
+
+    async function load() {
+      tableLoading(tbody, 6);
+      var res = await API.listClasses($("#search").value.trim());
+      if (res.error) { tableEmpty(tbody, 6, errMessage(res.error)); return; }
+
+      var rows = res.data || [];
+      if (!rows.length) { tableEmpty(tbody, 6, "No classes found."); return; }
+
+      tbody.innerHTML = rows.map(function (c) {
+        var t = teacherMap[c.class_teacher];
+        return "<tr>" +
+          "<td><strong>" + esc(c.name) + "</strong></td>" +
+          "<td>" + (t ? esc(t.name) : '<span class="badge badge-gold">Unassigned</span>') + "</td>" +
+          '<td class="center">' + (c.subjects || []).length + "</td>" +
+          '<td class="center">' + (c.students || []).length + "</td>" +
+          '<td class="center">' + esc(c.capacity || 40) + "</td>" +
+          '<td class="numeric">' +
+            '<button class="btn btn-outline btn-sm" data-edit="' + esc(c.id) + '">Edit</button> ' +
+            '<button class="btn btn-outline btn-sm" data-del="' + esc(c.id) + '">Delete</button>' +
+          "</td></tr>";
+      }).join("");
+
+      $$("[data-edit]", tbody).forEach(function (b) {
+        b.addEventListener("click", function () {
+          openForm(rows.find(function (r) { return r.id === b.getAttribute("data-edit"); }));
+        });
+      });
+
+      $$("[data-del]", tbody).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var id = b.getAttribute("data-del");
+          var row = rows.find(function (r) { return r.id === id; });
+          confirmAction("Delete class",
+            'Delete "' + row.name + '"? Registrations and results tied to this class will also be removed.',
+            async function () {
+              var res = await API.deleteClass(id);
+              if (res.error) { toastErr(errMessage(res.error)); return; }
+              toastOk("Class deleted");
+              load();
+            });
+        });
+      });
+    }
+
+    function openForm(row) {
+      var editing = !!row;
+      var chosen = editing ? (row.subjects || []).slice() : [];
+
+      var backdrop = openModal(
+        editing ? "Edit class" : "New class",
+        '<div class="field"><label for="f-name">Class name</label>' +
+          '<input id="f-name" value="' + (editing ? esc(row.name) : "") + '" placeholder="ND I Computer Science"></div>' +
+        '<div class="field"><label for="f-year">Academic session</label>' +
+          '<select id="f-year">' +
+            years.map(function (y) {
+              var on = editing ? row.academic_year === y.id : y.is_current;
+              return '<option value="' + esc(y.id) + '"' + (on ? " selected" : "") + ">" +
+                esc(y.name) + (y.is_current ? " (current)" : "") + "</option>";
+            }).join("") +
+          "</select></div>" +
+        '<div class="field"><label for="f-teacher">Class teacher</label>' +
+          '<select id="f-teacher"><option value="">Not assigned</option>' +
+            teachers.map(function (t) {
+              var on = editing && row.class_teacher === t.id;
+              return '<option value="' + esc(t.id) + '"' + (on ? " selected" : "") + ">" + esc(t.name) + "</option>";
+            }).join("") +
+          "</select></div>" +
+        '<div class="field"><label for="f-capacity">Capacity</label>' +
+          '<input id="f-capacity" type="number" min="1" value="' + (editing ? esc(row.capacity || 40) : "40") + '"></div>' +
+        '<div class="field"><label>Courses attached to this class</label>' +
+          '<div id="f-courses" style="max-height:220px;overflow-y:auto">' +
+            (courses.length
+              ? courses.map(function (c) {
+                  var on = chosen.indexOf(c.id) !== -1;
+                  return '<label class="checkbox-row' + (on ? " selected" : "") + '">' +
+                    '<input type="checkbox" value="' + esc(c.id) + '"' + (on ? " checked" : "") + ">" +
+                    "<span><strong>" + esc(c.code) + "</strong>" +
+                    '<span class="code">' + esc(c.name) + "</span></span>" +
+                    '<span class="meta"><span class="badge badge-grey">' + esc(c.unit) + "u</span></span>" +
+                  "</label>";
+                }).join("")
+              : '<p class="field-hint">No courses exist yet. Create courses first.</p>') +
+          "</div></div>" +
+        '<p class="field-error hidden" id="f-err"></p>',
+        '<button class="btn btn-outline" id="f-cancel">Cancel</button>' +
+        '<button class="btn btn-primary" id="f-save">' + (editing ? "Save changes" : "Create class") + "</button>"
+      );
+
+      $$("#f-courses input", backdrop).forEach(function (input) {
+        input.addEventListener("change", function () {
+          input.closest(".checkbox-row").classList.toggle("selected", input.checked);
+        });
+      });
+
+      $("#f-cancel", backdrop).addEventListener("click", closeModal);
+      $("#f-save", backdrop).addEventListener("click", async function () {
+        var err = $("#f-err", backdrop);
+        var name = $("#f-name", backdrop).value.trim();
+        if (!name) { err.textContent = "Class name is required."; show(err); return; }
+
+        var subjectIds = $$("#f-courses input:checked", backdrop).map(function (i) { return i.value; });
+        var teacher = $("#f-teacher", backdrop).value;
+
+        var payload = {
+          name: name,
+          academic_year: $("#f-year", backdrop).value || null,
+          class_teacher: teacher || null,
+          capacity: Number($("#f-capacity", backdrop).value) || 40,
+          subjects: subjectIds,
+        };
+
+        var btn = $("#f-save", backdrop);
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        var res = editing ? await API.updateClass(row.id, payload) : await API.createClass(payload);
+        if (res.error) {
+          err.textContent = /duplicate|unique/i.test(res.error.message || "")
+            ? "A class with that name already exists for this session."
+            : errMessage(res.error);
+          show(err);
+          btn.disabled = false;
+          btn.textContent = editing ? "Save changes" : "Create class";
+          return;
+        }
+
+        closeModal();
+        toastOk(editing ? "Class updated" : "Class created");
+        load();
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

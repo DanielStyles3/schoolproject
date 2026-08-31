@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registration Approvals — YABATECH Portal</title>
+  <meta name="theme-color" content="#216015">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="btn-menu" aria-label="Open menu">☰</button>
+        <img src="assets/yabatech-logo.png" alt="Yaba College of Technology">
+      </div>
+
+      <div class="content">
+        <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+
+        <div id="page-content" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>Registration Approvals</h1>
+              <p id="sub"></p>
+            </div>
+            <div class="actions">
+              <select id="filter-class" class="search-box" style="padding:9px 12px;border:1px solid var(--border-strong);border-radius:8px;font-family:inherit;font-size:14px;background:#fff">
+                <option value="">All classes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-3" id="stat-row"></div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h2>Student registrations</h2>
+                <p>Approve a submission to confirm the student's courses for the session.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Student</th><th>Class</th>
+                    <th class="center">Courses</th>
+                    <th>Status</th>
+                    <th class="numeric">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+  (async function () {
+    // Only admins may change registration status — the database RLS policy
+    // allows UPDATE for the owning student or an admin, nobody else.
+    if (!(await requireAuth(["admin"]))) return;
+
+    var yearId = Session.year ? Session.year.id : null;
+    var tbody = $("#rows");
+    var classMap = {};
+    var studentMap = {};
+
+    $("#sub").textContent = Session.year
+      ? "Session " + Session.year.name
+      : "No active session";
+
+    var classesRes = await API.listClasses();
+    (classesRes.data || []).forEach(function (c) {
+      classMap[c.id] = c;
+      var opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      $("#filter-class").appendChild(opt);
+    });
+
+    $("#filter-class").addEventListener("change", load);
+
+    await load();
+    pageReady();
+
+    async function load() {
+      tableLoading(tbody, 5);
+
+      var res = await API.listRegistrations({
+        academicYearId: yearId,
+        classId: $("#filter-class").value || null,
+      });
+
+      if (res.error) {
+        tableEmpty(tbody, 5, errMessage(res.error));
+        return;
+      }
+
+      var rows = res.data || [];
+      var students = await API.getUsersByIds(rows.map(function (r) { return r.student_id; }));
+      studentMap = byId(students.data);
+
+      var pending = rows.filter(function (r) { return r.status !== "approved"; }).length;
+      $("#stat-row").innerHTML =
+        '<div class="stat"><div class="label">Total registrations</div><div class="value">' + rows.length + "</div></div>" +
+        '<div class="stat gold"><div class="label">Awaiting approval</div><div class="value">' + pending + "</div></div>" +
+        '<div class="stat"><div class="label">Approved</div><div class="value">' + (rows.length - pending) + "</div></div>";
+
+      if (!rows.length) {
+        tableEmpty(tbody, 5, "No course registrations found for this selection.");
+        return;
+      }
+
+      tbody.innerHTML = rows.map(function (r) {
+        var s = studentMap[r.student_id] || {};
+        var c = classMap[r.class_id] || {};
+        var approved = r.status === "approved";
+        return "<tr>" +
+          "<td><strong>" + esc(s.name || "Unknown student") + "</strong>" +
+            '<span class="sub">' + esc(s.email || "") + "</span></td>" +
+          "<td>" + esc(c.name || "—") + "</td>" +
+          '<td class="center">' + (r.subject_ids || []).length + "</td>" +
+          "<td>" + statusBadge(r.status) + "</td>" +
+          '<td class="numeric">' +
+            '<button class="btn btn-sm ' + (approved ? "btn-outline" : "btn-primary") + '" ' +
+              'data-id="' + esc(r.id) + '" data-next="' + (approved ? "submitted" : "approved") + '">' +
+              (approved ? "Revert" : "Approve") +
+            "</button>" +
+          "</td>" +
+        "</tr>";
+      }).join("");
+
+      $$("#rows button").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          var id = btn.getAttribute("data-id");
+          var next = btn.getAttribute("data-next");
+          btn.disabled = true;
+          btn.textContent = "Saving…";
+
+          var res = await API.setRegistrationStatus(id, next);
+          if (res.error) {
+            toastErr(errMessage(res.error, "Could not update the registration"));
+            btn.disabled = false;
+            btn.textContent = next === "approved" ? "Approve" : "Revert";
+            return;
+          }
+          toastOk(next === "approved" ? "Registration approved" : "Approval reverted");
+          await load();
+        });
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

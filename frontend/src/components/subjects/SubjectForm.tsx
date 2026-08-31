@@ -208,7 +208,7 @@ export function SubjectForm({
             control={form.control}
             render={({ field: { value, onChange, ...field }, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <div className="flex flex-row space-x-3 rounded-xl border border-[#E8F5EE] bg-[#E8F5EE] p-4">
+                <div className="flex flex-row space-x-3 rounded-xl border border-border bg-surface-muted p-4">
                   <Checkbox
                     id="isActive"
                     checked={value}
